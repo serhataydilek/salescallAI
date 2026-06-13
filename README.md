@@ -408,7 +408,15 @@ Manual test:
 3. Click `Analyze Audio Call`.
 4. Wait while the app uploads, transcribes, analyzes, and opens the report.
 5. Confirm the report shows scores, mistakes, missed questions, suggested improvements, better example responses, summary, and transcript.
-6. Click `Download Text Report` if analysis is available.
+6. Click `Download Report` if analysis is available.
+
+## Sharing Reports
+
+SalesMirror reports can be shared from the call detail page:
+
+- Click `Download Report` to save a polished text report with title, date, source, status, scores, coaching notes, and transcript.
+- Click `Print Report` to open browser print. From there, choose `Save as PDF` if you want a PDF copy.
+- Native PDF export is a future TODO; the MVP currently uses text export and browser print/save-as-PDF.
 
 ## Backend Endpoints
 
