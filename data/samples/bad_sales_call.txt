@@ -1,0 +1,17 @@
+Salesperson: Hi, I wanted to show you SalesMirror. It is an AI tool for sales calls and it gives reports automatically.
+Customer: Okay, but I only have a few minutes.
+Salesperson: No problem. It has transcription, scoring, reports, and coaching suggestions. It is pretty easy to use.
+Customer: What kind of problem does it solve?
+Salesperson: It helps sales teams. You upload calls and get analysis.
+Customer: We already have call recordings. I am not sure we need another tool.
+Salesperson: This is different because it uses AI. It can score calls and tell reps what to improve.
+Customer: Maybe. We are mostly worried about onboarding new reps.
+Salesperson: Right, this would help with that. The dashboard shows calls and scores.
+Customer: How would we know if it is working?
+Salesperson: You would see the reports.
+Customer: What does it cost?
+Salesperson: We have not figured that out yet, but it should be reasonable.
+Customer: I probably need to talk to my manager.
+Salesperson: Sure. You can check the website later.
+Customer: Okay.
+Salesperson: Thanks. Bye.

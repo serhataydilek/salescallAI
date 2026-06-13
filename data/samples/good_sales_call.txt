@@ -1,0 +1,17 @@
+Salesperson: Hi Jordan, thanks for joining. I know we planned twenty minutes today. My goal is to understand how your team handles demo follow-up, see whether SalesMirror is relevant, and agree on a useful next step if it is.
+Customer: That sounds good.
+Salesperson: Before I explain anything, can you walk me through what happens after a rep finishes a demo today?
+Customer: Usually the rep writes notes in the CRM, sends an email, and maybe talks to the manager if the deal is important.
+Salesperson: How consistent is that process across the team?
+Customer: Not very. Some reps are great, but newer reps miss details and do not always follow up well.
+Salesperson: What impact does that have on conversion or coaching time?
+Customer: Managers spend a lot of time reviewing calls manually, and we think some good opportunities are slipping.
+Salesperson: What would make a call review tool valuable enough to pilot?
+Customer: It would need to save manager time and show reps specific coaching points.
+Salesperson: That is where SalesMirror fits. It turns a call transcript into a coaching report with scores, missed questions, and better example responses. The first value is not replacing managers, it is giving them a faster first draft.
+Customer: That sounds useful. My only concern is whether the team will trust the output.
+Salesperson: That is fair. I would not ask you to roll it out broadly first. A better path is a small pilot with five recorded calls, then your managers compare the reports against their own notes.
+Customer: I like that.
+Salesperson: Great. I will send a sample report today. As a next step, can we meet next Thursday with one manager to review the pilot criteria?
+Customer: Yes, next Thursday works.
+Salesperson: Perfect. I will send the summary, sample report, and proposed pilot checklist by the end of today.

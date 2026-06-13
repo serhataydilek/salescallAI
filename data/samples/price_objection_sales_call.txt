@@ -1,0 +1,17 @@
+Salesperson: Hi Morgan, thanks for taking the call. I would like to understand how your team reviews sales calls today and then see if a small SalesMirror pilot makes sense.
+Customer: Sure. We are interested, but I will be direct. Budget is tight this quarter.
+Salesperson: I appreciate you saying that. Before we talk price, can I ask what made you look at sales coaching tools now?
+Customer: Our new reps are taking too long to ramp. Managers are spending hours reviewing recordings.
+Salesperson: How many calls does a manager review in a typical week?
+Customer: Maybe ten per manager, sometimes more.
+Salesperson: And what are they usually looking for?
+Customer: Missed discovery questions, weak follow-up, and bad handling of pricing objections.
+Salesperson: That matches the problem SalesMirror is designed for. It creates a first-pass coaching report so managers can focus on judgment instead of starting from a blank page.
+Customer: I understand the value, but if this costs another few hundred dollars per month, it may be hard to justify.
+Salesperson: That makes sense. The way I would frame it is not as another tool, but as manager time saved and faster rep ramp. If one manager saves three hours a week and new reps improve follow-up quality, the pilot can pay for itself quickly.
+Customer: Maybe, but leadership will still ask for proof.
+Salesperson: Then we should not start with a large commitment. We can run a two-week pilot with ten calls, measure manager time saved, and compare the coaching reports against your current review notes.
+Customer: That would help.
+Salesperson: As a next step, I will send a sample report and a simple pilot scorecard. Can we review it with your sales enablement lead on Friday?
+Customer: Friday afternoon works.
+Salesperson: Great. I will send the materials today and include the pilot success criteria so the pricing discussion is tied to measurable value.

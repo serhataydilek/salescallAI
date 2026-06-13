@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+.next/
+dist/
+build/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environment
+.env
+backend/.env
+frontend/.env
+.env.local
+.env.*.local
+backend/.env.*
+frontend/.env.*
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+*.log
+
+# Local uploads: keep folder, ignore recordings
+backend/storage/uploads/*
+!backend/storage/uploads/.gitkeep
+backend/app/storage/uploads/*
+!backend/app/storage/uploads/.gitkeep
+
+# Local caches and evaluation outputs
+.cache/
+cache/
+data/eval/results/
+data/eval/*.results.json
+data/eval/*.results.jsonl
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
