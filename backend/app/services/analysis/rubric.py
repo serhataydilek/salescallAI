@@ -40,6 +40,11 @@ Scoring rules:
 - If the salesperson does not ask discovery questions, discovery_score must be low.
 - If there is no clear next step, closing_score and follow_up_score must be low.
 - If a customer raises a price objection and the salesperson does not address value, ROI, risk, or a pilot, objection_handling_score must be low.
+- If the salesperson gives vague answers such as "it uses AI", "it should be reasonable", "you can get back to me", or "check the website later", treat this as weak sales execution.
+- If the customer asks important questions and the salesperson answers vaguely, overall_score should usually be 55 or lower.
+- If there is weak discovery, vague ROI/value explanation, and no concrete next step, overall_score must not be above 60.
+- If the salesperson avoids defining success measurements, closing_score and follow_up_score should be low even if the tone is polite.
+- If a price objection is answered with "it is not expensive" or "AI products are usually expensive" without ROI, risk, value, or pilot framing, objection_handling_score must be low.
 - If the call is strong, still identify minor but useful coaching improvements instead of inventing severe mistakes.
 
 Output rules:

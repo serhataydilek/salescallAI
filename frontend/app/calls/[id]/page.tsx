@@ -9,7 +9,7 @@ function ListBlock({ title, items }: { title: string; items: string[] }) {
   return (
     <div className="report-block">
       <div className="block-heading">
-        <span aria-hidden="true">•</span>
+        <span aria-hidden="true">-</span>
         <h3>{title}</h3>
       </div>
       {items.length > 0 ? (
@@ -51,6 +51,18 @@ function ReportSummary({ analysis }: { analysis: Analysis }) {
   );
 }
 
+function sourceLabel(filePath: string): string {
+  if (filePath === "manual-transcript") {
+    return "Source: pasted transcript";
+  }
+
+  const pathParts = filePath.split(/[/\\]/);
+  const storedName = pathParts[pathParts.length - 1] ?? "";
+  const firstUnderscore = storedName.indexOf("_");
+  const originalName = firstUnderscore >= 0 ? storedName.slice(firstUnderscore + 1) : storedName;
+  return originalName ? `Source file: ${originalName}` : "Source: uploaded audio";
+}
+
 export default async function CallDetailPage({ params }: PageProps) {
   const { id } = await params;
   let call;
@@ -82,6 +94,7 @@ export default async function CallDetailPage({ params }: PageProps) {
           <span className="eyebrow">Sales Coaching Report</span>
           <h1>{call.filename}</h1>
           <p>Uploaded {new Date(call.created_at).toLocaleString()}</p>
+          <p className="meta">{sourceLabel(call.file_path)}</p>
         </div>
         <div className="report-header-actions">
           <span className={`status ${call.status}`}>{call.status}</span>

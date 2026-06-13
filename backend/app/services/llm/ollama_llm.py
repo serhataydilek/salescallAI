@@ -22,6 +22,8 @@ Ollama output contract:
 - better_example_responses must contain at least 2 strings.
 - short_summary must be specific to this transcript, not generic.
 - Be strict with scores; do not reward missing discovery, weak objection handling, or no next step.
+- Weak calls with vague product claims, no success metric, and no concrete next step should score in the weak range.
+- Use evidence from the transcript. Do not make the report sound stronger than the actual sales behavior.
 """
 
 

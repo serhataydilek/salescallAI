@@ -19,6 +19,7 @@ from app.schemas import (
 )
 from app.services.providers import get_llm_service, get_transcription_service
 from app.services.report_service import ReportService
+from app.services.title_service import generate_call_title
 
 router = APIRouter(prefix="/calls", tags=["calls"])
 
@@ -91,7 +92,7 @@ def create_call_from_transcript(
             detail=f"Transcript must be at least {MIN_TRANSCRIPT_LENGTH} characters.",
         )
 
-    title = (request.title or "").strip() or "Manual transcript"
+    title = generate_call_title(transcript_text, (request.title or "").strip())
     call = Call(filename=title[:255], file_path=MANUAL_TRANSCRIPT_FILE_PATH, status=CallStatus.transcribed)
     transcript = Transcript(text=transcript_text)
     call.transcript = transcript
@@ -124,6 +125,7 @@ def transcribe_call(call_id: int, db: Session = Depends(get_db)) -> TranscriptOu
         transcript_text = get_transcription_service().transcribe(call.file_path)
         transcript = call.transcript or Transcript(call_id=call.id, text=transcript_text)
         transcript.text = transcript_text
+        call.filename = generate_call_title(transcript_text, call.filename)
         call.status = CallStatus.transcribed
 
         db.add(transcript)

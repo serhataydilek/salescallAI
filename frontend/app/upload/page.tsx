@@ -13,10 +13,17 @@ import {
   validateTranscriptInput,
 } from "@/lib/api";
 
-type ActionState = "idle" | "uploading" | "transcribing" | "analyzing" | "analyzingTranscript";
-type WorkflowStatus = "idle" | "uploaded" | "transcribed" | "analyzed" | "failed";
+type ActionState = "idle" | "audio" | "transcript";
+type WorkflowStatus = "idle" | "uploaded" | "transcribing" | "transcribed" | "analyzing" | "analyzed" | "failed";
 
-const loadingSteps = [
+const audioLoadingSteps = [
+  "Uploading audio",
+  "Transcribing call",
+  "Analyzing sales performance",
+  "Building coaching report",
+];
+
+const transcriptLoadingSteps = [
   "Creating call record",
   "Reading transcript",
   "Analyzing sales performance",
@@ -26,7 +33,9 @@ const loadingSteps = [
 const statusLabels: Record<WorkflowStatus, string> = {
   idle: "Ready",
   uploaded: "Uploaded",
+  transcribing: "Transcribing",
   transcribed: "Transcribed",
+  analyzing: "Analyzing",
   analyzed: "Analyzed",
   failed: "Failed",
 };
@@ -36,49 +45,79 @@ export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null);
   const [title, setTitle] = useState("");
   const [manualTranscript, setManualTranscript] = useState("");
-  const [audioCallId, setAudioCallId] = useState<number | null>(null);
-  const [audioStatus, setAudioStatus] = useState<WorkflowStatus>("idle");
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState<WorkflowStatus>("idle");
+  const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [action, setAction] = useState<ActionState>("idle");
   const [loadingStepIndex, setLoadingStepIndex] = useState(0);
 
   const isBusy = action !== "idle";
-  const isTranscriptRunning = action === "analyzingTranscript";
-  const canTranscribeAudio = Boolean(audioCallId) && !isBusy && audioStatus !== "analyzed";
-  const canAnalyzeAudio = Boolean(audioCallId) && !isBusy && (audioStatus === "transcribed" || audioStatus === "analyzed");
+  const activeSteps = action === "audio" ? audioLoadingSteps : transcriptLoadingSteps;
 
   useEffect(() => {
-    if (!isTranscriptRunning) {
+    if (!isBusy) {
       setLoadingStepIndex(0);
       return;
     }
 
     const intervalId = window.setInterval(() => {
-      setLoadingStepIndex((current) => Math.min(current + 1, loadingSteps.length - 1));
-    }, 1400);
+      setLoadingStepIndex((current) => Math.min(current + 1, activeSteps.length - 1));
+    }, 1800);
 
     return () => window.clearInterval(intervalId);
-  }, [isTranscriptRunning]);
+  }, [activeSteps.length, isBusy]);
 
-  function resetAudioState() {
-    setAudioCallId(null);
-    setAudioStatus("idle");
-    setStatus("");
+  async function runAudioAnalysis() {
+    const selectedFile = file;
+    const validationError = validateAudioFile(selectedFile);
+    if (validationError) {
+      setError(validationError);
+      setMessage("");
+      setStatus("failed");
+      return;
+    }
+    if (!selectedFile) return;
+
+    setAction("audio");
     setError("");
+    setMessage("");
+    setStatus("uploaded");
+
+    try {
+      setLoadingStepIndex(0);
+      const uploaded = await uploadCall(selectedFile);
+
+      setStatus("transcribing");
+      setLoadingStepIndex(1);
+      await transcribeCall(uploaded.call_id);
+
+      setStatus("analyzing");
+      setLoadingStepIndex(2);
+      await analyzeCall(uploaded.call_id);
+
+      setStatus("analyzed");
+      setLoadingStepIndex(3);
+      router.push(`/calls/${uploaded.call_id}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not analyze audio call.");
+      setStatus("failed");
+      setAction("idle");
+    }
   }
 
   async function runTranscriptAnalysis() {
     const validationError = validateTranscriptInput(manualTranscript);
     if (validationError) {
       setError(validationError);
-      setStatus("");
+      setMessage("");
+      setStatus("failed");
       return;
     }
 
-    setAction("analyzingTranscript");
+    setAction("transcript");
     setError("");
-    setStatus("");
+    setMessage("");
+    setStatus("uploaded");
 
     try {
       setLoadingStepIndex(0);
@@ -87,91 +126,30 @@ export default function UploadPage() {
         transcript: manualTranscript.trim(),
       });
 
+      setStatus("analyzing");
       setLoadingStepIndex(2);
       await analyzeCall(createdCall.id);
 
+      setStatus("analyzed");
       setLoadingStepIndex(3);
       router.push(`/calls/${createdCall.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not analyze transcript.");
+      setStatus("failed");
       setAction("idle");
     }
   }
 
-  async function runAudioUpload() {
-    const selectedFile = file;
-    const validationError = validateAudioFile(selectedFile);
-    if (validationError) {
-      setError(validationError);
-      setStatus("");
-      return;
-    }
-    if (!selectedFile) return;
-
-    setAction("uploading");
-    setError("");
-    setAudioStatus("idle");
-    setStatus("Uploading call...");
-    try {
-      const result = await uploadCall(selectedFile);
-      setAudioCallId(result.call_id);
-      setAudioStatus("uploaded");
-      setStatus(`Uploaded ${result.filename}.`);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload failed.");
-      setAudioStatus("failed");
-      setStatus("");
-    } finally {
-      setAction("idle");
-    }
-  }
-
-  async function runAudioTranscribe() {
-    if (!audioCallId) return;
-    setAction("transcribing");
-    setError("");
-    setStatus("Transcribing audio locally. This can take a while for real audio...");
-    try {
-      await transcribeCall(audioCallId);
-      setAudioStatus("transcribed");
-      setStatus("Transcribed. You can now analyze the call.");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Transcription failed.");
-      setAudioStatus("failed");
-      setStatus("");
-    } finally {
-      setAction("idle");
-    }
-  }
-
-  async function runAudioAnalyze() {
-    if (!audioCallId) return;
-    setAction("analyzing");
-    setError("");
-    setStatus("Analyzing transcript with the configured local provider...");
-    try {
-      await analyzeCall(audioCallId);
-      setAudioStatus("analyzed");
-      setStatus("Analyzed. The coaching report is ready.");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Analysis failed.");
-      setAudioStatus("failed");
-      setStatus("");
-    } finally {
-      setAction("idle");
-    }
-  }
-
-  if (isTranscriptRunning) {
+  if (isBusy) {
     return (
       <section className="analysis-loading">
         <div className="loading-card">
           <div className="loader-ring" />
           <span className="eyebrow">SalesMirror</span>
           <h1>Generating Sales Coaching Report</h1>
-          <p>{loadingSteps[loadingStepIndex]}</p>
+          <p>{activeSteps[loadingStepIndex]}</p>
           <div className="loading-steps">
-            {loadingSteps.map((step, index) => (
+            {activeSteps.map((step, index) => (
               <span className={index <= loadingStepIndex ? "active" : ""} key={step}>
                 {step}
               </span>
@@ -185,109 +163,98 @@ export default function UploadPage() {
   return (
     <section className="section">
       <div className="hero compact-hero">
-        <h1>Analyze Sales Call Transcript</h1>
-        <p>Paste a sales call transcript and SalesMirror will generate a coaching report.</p>
+        <h1>Analyze Sales Call Audio</h1>
+        <p>Upload a sales call recording and SalesMirror will transcribe it, analyze it, and generate a coaching report.</p>
       </div>
 
       <div className="primary-workspace">
-        <label className="field">
-          <span>Call title</span>
+        <div className="upload-box">
+          <div>
+            <span className="eyebrow">Primary Flow</span>
+            <h2>Upload Audio Call</h2>
+            <p>Use a short sales call file for the local MVP. Real local transcription can take a while on CPU.</p>
+          </div>
+
           <input
-            onChange={(event) => setTitle(event.target.value)}
-            placeholder="Discovery call with Acme"
-            type="text"
-            value={title}
-          />
-        </label>
-        <label className="field">
-          <span>Transcript</span>
-          <textarea
+            accept={ALLOWED_AUDIO_EXTENSIONS.join(",")}
+            disabled={isBusy}
             onChange={(event) => {
-              setManualTranscript(event.target.value);
-              setError("");
-              setStatus("");
+              const selectedFile = event.target.files?.[0] ?? null;
+              setFile(selectedFile);
+              setError(validateAudioFile(selectedFile) ?? "");
+              setMessage("");
+              setStatus("idle");
             }}
-            placeholder={"Salesperson: Hi, thanks for joining today.\nCustomer: Happy to talk."}
-            rows={16}
-            value={manualTranscript}
+            type="file"
           />
-        </label>
-        <div className="workspace-footer">
-          <p className="helper-text">Use speaker labels like Salesperson and Customer. Minimum 30 characters.</p>
-          <button disabled={isBusy} onClick={runTranscriptAnalysis} type="button">
-            Analyze Transcript
-          </button>
+          <p className="helper-text">Supported formats: mp3, wav, m4a, webm. Empty files are rejected.</p>
+
+          <div className="workflow-status">
+            <span className={`status ${status === "idle" ? "uploaded" : status}`}>{statusLabels[status]}</span>
+            <p>
+              {status === "idle"
+                ? "Choose an audio file, then run the full analysis flow."
+                : status === "failed"
+                  ? "The last step failed. Check the error and try again."
+                  : "SalesMirror is preparing the report."}
+            </p>
+          </div>
+
+          <div className="actions">
+            <button disabled={isBusy} onClick={runAudioAnalysis} type="button">
+              Analyze Audio Call
+            </button>
+            <Link className="button secondary" href="/calls">
+              View Calls
+            </Link>
+          </div>
         </div>
       </div>
 
       {error ? <div className="message error">{error}</div> : null}
-      {status ? <div className="message">{status}</div> : null}
+      {message ? <div className="message">{message}</div> : null}
 
       <details className="secondary-tool">
-        <summary>Need to convert audio/video first?</summary>
+        <summary>Already have a transcript?</summary>
         <div className="secondary-tool-body">
           <p>
-            SalesMirror works best with transcripts. If you have audio or video, convert it to text first using the{" "}
+            Paste an existing transcript when you want to test analysis quality without running local audio transcription.
+            If your source is video, you can convert it first with{" "}
             <a href="https://github.com/serhataydilek/videototext" rel="noreferrer" target="_blank">
-              VideoToText tool
+              VideoToText
             </a>
             .
           </p>
 
-          <div className="upload-box subtle">
-            <div>
-              <h2>Optional Dev Audio Flow</h2>
-              <p>Keep using the local audio pipeline when you want to test faster-whisper inside SalesMirror.</p>
-            </div>
+          <label className="field">
+            <span>Call title</span>
             <input
-              accept={ALLOWED_AUDIO_EXTENSIONS.join(",")}
-              onChange={(event) => {
-                const selectedFile = event.target.files?.[0] ?? null;
-                setFile(selectedFile);
-                resetAudioState();
-                setError(validateAudioFile(selectedFile) ?? "");
-              }}
-              type="file"
+              disabled={isBusy}
+              onChange={(event) => setTitle(event.target.value)}
+              placeholder="Optional title"
+              type="text"
+              value={title}
             />
-            <p className="helper-text">Supported formats: mp3, wav, m4a, webm. Empty files are rejected.</p>
-            <div className="workflow-status">
-              <span className={`status ${audioStatus === "idle" ? "uploaded" : audioStatus}`}>
-                {action === "uploading"
-                  ? "Uploading"
-                  : action === "transcribing"
-                    ? "Transcribing"
-                    : action === "analyzing"
-                      ? "Analyzing"
-                      : statusLabels[audioStatus]}
-              </span>
-              <p>
-                {audioStatus === "idle"
-                  ? "Upload audio only when testing the local transcription path."
-                  : audioStatus === "uploaded"
-                    ? "Audio is saved. Run transcription next."
-                    : audioStatus === "transcribed"
-                      ? "Transcript is saved. Run analysis next."
-                      : audioStatus === "analyzed"
-                        ? "Report is ready to view."
-                        : "The last step failed. Check the error and try again."}
-              </p>
-            </div>
-            <div className="actions">
-              <button disabled={isBusy} onClick={runAudioUpload} type="button">
-                {action === "uploading" ? "Uploading..." : "Upload Audio"}
-              </button>
-              <button className="secondary" disabled={!canTranscribeAudio} onClick={runAudioTranscribe} type="button">
-                {action === "transcribing" ? "Transcribing..." : "Transcribe"}
-              </button>
-              <button className="secondary" disabled={!canAnalyzeAudio} onClick={runAudioAnalyze} type="button">
-                {action === "analyzing" ? "Analyzing..." : "Analyze"}
-              </button>
-              {audioCallId ? (
-                <Link className="button secondary" href={`/calls/${audioCallId}`}>
-                  View Report
-                </Link>
-              ) : null}
-            </div>
+          </label>
+          <label className="field">
+            <span>Transcript</span>
+            <textarea
+              disabled={isBusy}
+              onChange={(event) => {
+                setManualTranscript(event.target.value);
+                setError("");
+                setMessage("");
+              }}
+              placeholder={"Salesperson: Hi, thanks for joining today.\nCustomer: Happy to talk."}
+              rows={12}
+              value={manualTranscript}
+            />
+          </label>
+          <div className="workspace-footer">
+            <p className="helper-text">Use speaker labels like Salesperson and Customer. Minimum 30 characters.</p>
+            <button disabled={isBusy} onClick={runTranscriptAnalysis} type="button">
+              Analyze Transcript
+            </button>
           </div>
         </div>
       </details>
