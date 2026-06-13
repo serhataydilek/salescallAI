@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DeleteCallButton } from "@/components/DeleteCallButton";
 import { PrintButton } from "@/components/PrintButton";
 import { type Analysis, getCall, reportUrl } from "@/lib/api";
 
@@ -111,6 +112,7 @@ export default async function CallDetailPage({ params }: PageProps) {
               </a>
             </>
           ) : null}
+          <DeleteCallButton callId={call.id} redirectTo="/calls" />
         </div>
       </header>
 

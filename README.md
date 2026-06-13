@@ -418,6 +418,12 @@ SalesMirror reports can be shared from the call detail page:
 - Click `Print Report` to open browser print. From there, choose `Save as PDF` if you want a PDF copy.
 - Native PDF export is a future TODO; the MVP currently uses text export and browser print/save-as-PDF.
 
+## Deleting Calls
+
+Use `Delete Call` from the call list or report page to remove one selected local call. This deletes the call record, transcript, analysis, and the uploaded audio file when that file is inside `backend/storage/uploads/`.
+
+`Clear Calls` is kept as a local development utility in the calls page Danger Zone. It should not be the normal cleanup path.
+
 ## Backend Endpoints
 
 - `POST /calls/upload`
@@ -427,6 +433,8 @@ SalesMirror reports can be shared from the call detail page:
 - `GET /calls`
 - `GET /calls/{call_id}`
 - `GET /calls/{call_id}/report.txt`
+- `DELETE /calls/{call_id}`
+- `DELETE /calls` local/dev clear-all utility
 - `GET /health`
 
 ## Provider Architecture

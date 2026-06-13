@@ -113,6 +113,16 @@ export function getCall(id: string): Promise<CallDetail> {
   return request<CallDetail>(`/calls/${id}`);
 }
 
+export function clearCalls(): Promise<{ deleted_count: number; deleted_files: number }> {
+  return request<{ deleted_count: number; deleted_files: number }>("/calls", { method: "DELETE" });
+}
+
+export function deleteCall(id: number): Promise<{ deleted_call_id: number; deleted_file: boolean; message: string }> {
+  return request<{ deleted_call_id: number; deleted_file: boolean; message: string }>(`/calls/${id}`, {
+    method: "DELETE",
+  });
+}
+
 export function uploadCall(file: File): Promise<{ call_id: number; filename: string; status: string }> {
   const body = new FormData();
   body.append("file", file);

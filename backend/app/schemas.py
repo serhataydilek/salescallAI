@@ -61,3 +61,14 @@ class UploadResponse(BaseModel):
 class CreateTranscriptCallRequest(BaseModel):
     title: str | None = None
     transcript: str
+
+
+class ClearCallsResponse(BaseModel):
+    deleted_count: int
+    deleted_files: int
+
+
+class DeleteCallResponse(BaseModel):
+    deleted_call_id: int
+    deleted_file: bool
+    message: str

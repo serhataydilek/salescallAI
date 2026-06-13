@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CallList } from "@/components/CallList";
+import { ClearCallsButton } from "@/components/ClearCallsButton";
 import { type Call, getCalls } from "@/lib/api";
 
 export default async function CallsPage() {
@@ -24,6 +25,16 @@ export default async function CallsPage() {
         </Link>
       </div>
       {loadError ? <div className="message error">{loadError}</div> : <CallList calls={calls} />}
+
+      {!loadError ? (
+        <div className="danger-zone">
+          <div>
+            <h2>Danger Zone</h2>
+            <p>Local development utility. Use single-call delete for normal cleanup.</p>
+          </div>
+          <ClearCallsButton disabled={calls.length === 0} />
+        </div>
+      ) : null}
     </section>
   );
 }

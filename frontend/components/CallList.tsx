@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DeleteCallButton } from "@/components/DeleteCallButton";
 import type { Call } from "@/lib/api";
 
 export function CallList({ calls, showUploadAction = true }: { calls: Call[]; showUploadAction?: boolean }) {
@@ -31,6 +32,7 @@ export function CallList({ calls, showUploadAction = true }: { calls: Call[]; sh
             <Link className="button secondary" href={`/calls/${call.id}`}>
               View Report
             </Link>
+            <DeleteCallButton callId={call.id} />
           </div>
         </article>
       ))}

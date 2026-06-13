@@ -13,7 +13,9 @@ from app.schemas import (
     AnalysisOut,
     CallDetailOut,
     CallOut,
+    ClearCallsResponse,
     CreateTranscriptCallRequest,
+    DeleteCallResponse,
     TranscriptOut,
     UploadResponse,
 )
@@ -48,6 +50,25 @@ def validate_upload_filename(filename: str | None) -> str:
         raise HTTPException(status_code=400, detail=f"Unsupported file type. Allowed extensions: {allowed}.")
 
     return safe_filename
+
+
+def remove_local_upload(file_path: str) -> bool:
+    if file_path == MANUAL_TRANSCRIPT_FILE_PATH:
+        return False
+
+    try:
+        upload_root = UPLOAD_DIR.resolve()
+        target = Path(file_path).resolve(strict=False)
+    except OSError:
+        return False
+
+    if upload_root != target.parent and upload_root not in target.parents:
+        return False
+    if not target.exists() or not target.is_file():
+        return False
+
+    target.unlink()
+    return True
 
 
 @router.post("/upload", response_model=UploadResponse)
@@ -171,6 +192,61 @@ def analyze_call(call_id: int, db: Session = Depends(get_db)) -> AnalysisOut:
 @router.get("", response_model=list[CallOut])
 def list_calls(db: Session = Depends(get_db)) -> list[CallOut]:
     return list(db.scalars(select(Call).order_by(Call.created_at.desc())).all())
+
+
+@router.delete("", response_model=ClearCallsResponse)
+def clear_calls(db: Session = Depends(get_db)) -> ClearCallsResponse:
+    calls = list(
+        db.scalars(
+            select(Call).options(selectinload(Call.transcript), selectinload(Call.analysis)).order_by(Call.id)
+        ).all()
+    )
+    file_paths = [call.file_path for call in calls]
+
+    try:
+        for call in calls:
+            db.delete(call)
+        db.commit()
+    except Exception as exc:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Could not clear calls.") from exc
+
+    deleted_files = 0
+    for file_path in file_paths:
+        try:
+            if remove_local_upload(file_path):
+                deleted_files += 1
+        except OSError:
+            continue
+
+    return ClearCallsResponse(deleted_count=len(calls), deleted_files=deleted_files)
+
+
+@router.delete("/{call_id}", response_model=DeleteCallResponse)
+def delete_call(call_id: int, db: Session = Depends(get_db)) -> DeleteCallResponse:
+    call = get_call_with_related(db, call_id)
+    if not call:
+        raise HTTPException(status_code=404, detail="Call not found.")
+
+    file_path = call.file_path
+    try:
+        db.delete(call)
+        db.commit()
+    except Exception as exc:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Could not delete call.") from exc
+
+    deleted_file = False
+    try:
+        deleted_file = remove_local_upload(file_path)
+    except OSError:
+        deleted_file = False
+
+    return DeleteCallResponse(
+        deleted_call_id=call_id,
+        deleted_file=deleted_file,
+        message="Call deleted successfully.",
+    )
 
 
 @router.get("/{call_id}", response_model=CallDetailOut)

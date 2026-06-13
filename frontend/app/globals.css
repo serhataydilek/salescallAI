@@ -119,6 +119,20 @@ button.secondary {
   color: var(--text);
 }
 
+.button.danger,
+button.danger {
+  background: #fff7f6;
+  border-color: #f6b7b2;
+  color: var(--danger);
+}
+
+.button.danger.strong,
+button.danger.strong {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #ffffff;
+}
+
 button:disabled {
   cursor: not-allowed;
   opacity: 0.6;
@@ -305,6 +319,33 @@ code {
 
 .workflow-status p {
   font-size: 14px;
+}
+
+.clear-calls-control {
+  display: grid;
+  gap: 8px;
+}
+
+.delete-call-control {
+  display: grid;
+  gap: 8px;
+}
+
+.danger-zone {
+  align-items: center;
+  background: #fff7f6;
+  border: 1px solid #f6b7b2;
+  border-radius: 8px;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  margin-top: 8px;
+  padding: 18px;
+}
+
+.danger-zone h2 {
+  color: var(--danger);
+  font-size: 20px;
 }
 
 .primary-workspace {
