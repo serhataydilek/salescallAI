@@ -16,6 +16,22 @@ The API will be available at `http://localhost:8000`.
 
 SQLite is used by default. Set `DATABASE_URL` to use PostgreSQL.
 
+## Environment
+
+The backend app and backend scripts load local settings from:
+
+```text
+backend/.env
+```
+
+Create it from the repo example:
+
+```powershell
+copy ..\.env.example .env
+```
+
+Never commit real `.env` files.
+
 ## AI Providers
 
 Mock providers are enabled by default:
@@ -40,6 +56,9 @@ Then set:
 ```env
 USE_MOCK_TRANSCRIPTION=false
 USE_MOCK_LLM=false
+WHISPER_MODEL_SIZE=base
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_MODEL=qwen2.5:7b
 ```
 
 ## Smoke Tests

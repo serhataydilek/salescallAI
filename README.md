@@ -53,7 +53,21 @@ The frontend expects the backend at `http://localhost:8000`. Override with `NEXT
 
 ## Environment
 
-Copy `.env.example` to `backend/.env` for backend AI settings:
+The backend loads environment variables from:
+
+```text
+backend/.env
+```
+
+Create it from the committed example:
+
+```powershell
+copy .env.example backend\.env
+```
+
+Never commit real `.env` files. `.env`, `backend/.env`, and `frontend/.env` are ignored by git.
+
+Safer mock development mode:
 
 ```env
 WHISPER_MODEL_SIZE=base
@@ -63,7 +77,19 @@ OLLAMA_MODEL=qwen2.5:7b
 USE_MOCK_LLM=true
 ```
 
-Mock mode is the default and requires no local AI install.
+Mock mode requires no Ollama or faster-whisper install.
+
+Real local AI mode:
+
+```env
+USE_MOCK_TRANSCRIPTION=false
+USE_MOCK_LLM=false
+WHISPER_MODEL_SIZE=base
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_MODEL=qwen2.5:7b
+```
+
+Real local AI mode requires Ollama running with `qwen2.5:7b` pulled and faster-whisper dependencies installed.
 
 ## Test With Mock AI
 
