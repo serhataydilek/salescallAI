@@ -8,12 +8,19 @@ type PageProps = {
 function ListBlock({ title, items }: { title: string; items: string[] }) {
   return (
     <div className="report-block">
-      <h3>{title}</h3>
-      <ul>
-        {items.map((item) => (
-          <li key={item}>{item}</li>
-        ))}
-      </ul>
+      <div className="block-heading">
+        <span aria-hidden="true">•</span>
+        <h3>{title}</h3>
+      </div>
+      {items.length > 0 ? (
+        <ul>
+          {items.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      ) : (
+        <p>No items returned for this section.</p>
+      )}
     </div>
   );
 }
@@ -36,7 +43,7 @@ function ReportSummary({ analysis }: { analysis: Analysis }) {
         <div className="overall-score">{analysis.overall_score}</div>
       </div>
       <div>
-        <h2>Sales Coaching Report</h2>
+        <h2>Analysis Summary</h2>
         <p>{analysis.short_summary}</p>
         <p>{analysis.talk_ratio_feedback}</p>
       </div>
@@ -65,27 +72,35 @@ export default async function CallDetailPage({ params }: PageProps) {
   }
 
   const analysis = call.analysis;
+  const transcriptText = call.transcript?.text.trim() ?? "";
+  const isFailed = call.status === "failed";
 
   return (
     <section className="section">
-      <div className="call-card-top">
+      <div className="report-header">
         <div>
+          <span className="eyebrow">Sales Coaching Report</span>
           <h1>{call.filename}</h1>
           <p>Uploaded {new Date(call.created_at).toLocaleString()}</p>
         </div>
-        <span className={`status ${call.status}`}>{call.status}</span>
+        <div className="report-header-actions">
+          <span className={`status ${call.status}`}>{call.status}</span>
+          <Link className="button secondary" href="/calls">
+            Back to Calls
+          </Link>
+          {analysis ? (
+            <a className="button" href={reportUrl(call.id)}>
+              Download Text Report
+            </a>
+          ) : null}
+        </div>
       </div>
 
-      <div className="actions">
-        <Link className="button secondary" href="/calls">
-          Back to Calls
-        </Link>
-        {analysis ? (
-          <a className="button" href={reportUrl(call.id)}>
-            Download Text Report
-          </a>
-        ) : null}
-      </div>
+      {isFailed ? (
+        <div className="message error">
+          This call is marked as failed. Try uploading the audio again or rerun the last step from the upload flow.
+        </div>
+      ) : null}
 
       {analysis ? (
         <>
@@ -94,7 +109,7 @@ export default async function CallDetailPage({ params }: PageProps) {
           <div className="report-section">
             <div>
               <span className="eyebrow">Score Breakdown</span>
-              <h2>Conversation Quality</h2>
+              <h2>Category Scores</h2>
             </div>
             <div className="score-grid">
               <ScoreCard label="Opening" value={analysis.opening_score} />
@@ -106,7 +121,7 @@ export default async function CallDetailPage({ params }: PageProps) {
           </div>
 
           <div className="two-column">
-            <ListBlock title="Top Mistakes" items={analysis.top_3_mistakes} />
+            <ListBlock title="Coaching Opportunities" items={analysis.top_3_mistakes} />
             <ListBlock title="Missed Questions" items={analysis.missed_questions} />
             <ListBlock title="Suggested Improvements" items={analysis.suggested_improvements} />
             <ListBlock title="Better Example Responses" items={analysis.better_example_responses} />
@@ -115,7 +130,11 @@ export default async function CallDetailPage({ params }: PageProps) {
       ) : (
         <div className="empty-state">
           <h2>Analysis not ready</h2>
-          <p>Run Transcribe and Analyze from the upload flow to generate this coaching report.</p>
+          <p>
+            {transcriptText
+              ? "Transcript is available. Run Analyze from the upload flow to generate this coaching report."
+              : "Run Transcribe and Analyze from the upload flow to generate this coaching report."}
+          </p>
           <Link className="button" href="/upload">
             Go to Upload
           </Link>
@@ -125,9 +144,16 @@ export default async function CallDetailPage({ params }: PageProps) {
       <div className="report-section">
         <div>
           <span className="eyebrow">Transcript</span>
-          <h2>Call Conversation</h2>
+          <h2>Call Transcript</h2>
         </div>
-        {call.transcript ? <pre>{call.transcript.text}</pre> : <p>No transcript yet. Go to upload flow and run Transcribe.</p>}
+        {transcriptText ? (
+          <pre className="transcript-box">{transcriptText}</pre>
+        ) : (
+          <div className="empty-state compact">
+            <h3>No transcript yet</h3>
+            <p>Run Transcribe from the upload flow. Real local transcription can take a while on CPU.</p>
+          </div>
+        )}
       </div>
     </section>
   );

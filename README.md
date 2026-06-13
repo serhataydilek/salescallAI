@@ -69,10 +69,9 @@ Mock mode is the default and requires no local AI install.
 
 1. Start backend and frontend.
 2. Open `http://localhost:3000/upload`.
-3. Upload a non-empty `.mp3`, `.wav`, `.m4a`, or `.webm` file.
-4. Click `Transcribe`.
-5. Click `Analyze`.
-6. Click `View Report`.
+3. Paste a transcript in the main transcript box.
+4. Click `Analyze Transcript`.
+5. SalesMirror creates the call, analyzes it, and opens the report automatically.
 
 Supported upload extensions are `.mp3`, `.wav`, `.m4a`, and `.webm`. Empty files are rejected.
 
@@ -85,6 +84,43 @@ python scripts\seed_demo.py
 ```
 
 Then open `http://localhost:3000/calls`.
+
+## Recommended Demo Flow
+
+1. Convert audio/video to a transcript with VideoToText if needed:
+   `https://github.com/serhataydilek/videototext`
+2. Paste the transcript into SalesMirror.
+3. Click `Analyze Transcript`.
+4. Review the generated coaching report.
+
+To use real local Ollama analysis instead of mock analysis, set `backend/.env`:
+
+```env
+USE_MOCK_LLM=false
+OLLAMA_MODEL=qwen2.5:7b
+OLLAMA_BASE_URL=http://localhost:11434
+```
+
+## Using Direct Transcript Input
+
+Use direct transcript input when you already have a transcript and want to test SalesMirror analysis without audio transcription. This is the main product flow.
+
+1. Start the backend and frontend.
+2. Open `http://localhost:3000/upload`.
+3. Enter an optional title.
+4. Paste a transcript using speaker labels, for example:
+
+```text
+Salesperson: Hi, thanks for joining today.
+Customer: Happy to talk.
+```
+
+5. Click `Analyze Transcript`.
+6. Wait while SalesMirror creates the call, analyzes it, and opens the report.
+
+The analysis uses the configured provider. With `USE_MOCK_LLM=true`, it uses mock analysis. With `USE_MOCK_LLM=false`, it uses local Ollama.
+
+This is useful for testing prompt and model quality without waiting for faster-whisper transcription.
 
 ## Install Ollama
 
@@ -305,6 +341,46 @@ After the backend-only scripts pass, test from the frontend:
 4. Click `Transcribe`.
 5. Click `Analyze`.
 6. Review the call report.
+
+## Testing Real Local AI From the Frontend
+
+The frontend uses the same upload -> transcribe -> analyze flow for mock and real local AI. Real local AI can be slower, especially CPU transcription.
+
+Set `backend/.env`:
+
+```env
+USE_MOCK_TRANSCRIPTION=false
+USE_MOCK_LLM=false
+WHISPER_MODEL_SIZE=base
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_MODEL=qwen2.5:7b
+```
+
+Start the backend:
+
+```powershell
+cd C:\Users\serfu\OneDrive\Desktop\projects\salescall\salesmirror\backend
+.\.venv\Scripts\Activate.ps1
+uvicorn app.main:app --reload --port 8000
+```
+
+Start the frontend:
+
+```powershell
+cd C:\Users\serfu\OneDrive\Desktop\projects\salescall\salesmirror\frontend
+npm run dev
+```
+
+Manual test:
+
+1. Open `http://localhost:3000/upload`.
+2. Upload a short `.wav`, `.webm`, `.mp3`, or `.m4a` file.
+3. Wait for `Uploaded`.
+4. Click `Transcribe` and wait for `Transcribed`.
+5. Click `Analyze` and wait for `Analyzed`.
+6. Click `View Report`.
+7. Confirm the report shows scores, mistakes, missed questions, suggested improvements, better example responses, summary, and transcript.
+8. Click `Download Text Report` if analysis is available.
 
 ## Backend Endpoints
 

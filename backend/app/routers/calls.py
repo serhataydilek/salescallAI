@@ -8,7 +8,15 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.database import get_db
 from app.models import Analysis, Call, CallStatus, Transcript
-from app.schemas import AnalysisBase, AnalysisOut, CallDetailOut, CallOut, TranscriptOut, UploadResponse
+from app.schemas import (
+    AnalysisBase,
+    AnalysisOut,
+    CallDetailOut,
+    CallOut,
+    CreateTranscriptCallRequest,
+    TranscriptOut,
+    UploadResponse,
+)
 from app.services.providers import get_llm_service, get_transcription_service
 from app.services.report_service import ReportService
 
@@ -18,6 +26,8 @@ UPLOAD_DIR = Path(__file__).resolve().parents[2] / "storage" / "uploads"
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 ALLOWED_AUDIO_EXTENSIONS = {".mp3", ".wav", ".m4a", ".webm"}
 MAX_UPLOAD_CHUNK_SIZE = 1024 * 1024
+MIN_TRANSCRIPT_LENGTH = 30
+MANUAL_TRANSCRIPT_FILE_PATH = "manual-transcript"
 
 
 def get_call_with_related(db: Session, call_id: int) -> Call | None:
@@ -66,6 +76,38 @@ async def upload_call(file: UploadFile = File(...), db: Session = Depends(get_db
         raise HTTPException(status_code=500, detail="Could not create call record.") from exc
 
     return UploadResponse(call_id=call.id, filename=call.filename, status=call.status.value)
+
+
+@router.post("/from-transcript", response_model=CallDetailOut)
+def create_call_from_transcript(
+    request: CreateTranscriptCallRequest, db: Session = Depends(get_db)
+) -> CallDetailOut:
+    transcript_text = request.transcript.strip()
+    if not transcript_text:
+        raise HTTPException(status_code=400, detail="Transcript cannot be empty.")
+    if len(transcript_text) < MIN_TRANSCRIPT_LENGTH:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Transcript must be at least {MIN_TRANSCRIPT_LENGTH} characters.",
+        )
+
+    title = (request.title or "").strip() or "Manual transcript"
+    call = Call(filename=title[:255], file_path=MANUAL_TRANSCRIPT_FILE_PATH, status=CallStatus.transcribed)
+    transcript = Transcript(text=transcript_text)
+    call.transcript = transcript
+
+    try:
+        db.add(call)
+        db.commit()
+        db.refresh(call)
+    except Exception as exc:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Could not create transcript call.") from exc
+
+    created_call = get_call_with_related(db, call.id)
+    if not created_call:
+        raise HTTPException(status_code=500, detail="Created call could not be loaded.")
+    return created_call
 
 
 @router.post("/{call_id}/transcribe", response_model=TranscriptOut)

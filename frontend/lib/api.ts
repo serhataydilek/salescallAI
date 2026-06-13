@@ -98,6 +98,13 @@ export function validateAudioFile(file: File | null): string | null {
   return null;
 }
 
+export function validateTranscriptInput(transcript: string): string | null {
+  const trimmed = transcript.trim();
+  if (!trimmed) return "Transcript cannot be empty.";
+  if (trimmed.length < 30) return "Transcript must be at least 30 characters.";
+  return null;
+}
+
 export function getCalls(): Promise<Call[]> {
   return request<Call[]>("/calls");
 }
@@ -112,6 +119,14 @@ export function uploadCall(file: File): Promise<{ call_id: number; filename: str
   return request("/calls/upload", {
     method: "POST",
     body,
+  });
+}
+
+export function createCallFromTranscript(input: { title?: string; transcript: string }): Promise<CallDetail> {
+  return request<CallDetail>("/calls/from-transcript", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
   });
 }
 

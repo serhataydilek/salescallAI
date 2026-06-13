@@ -57,3 +57,7 @@ class UploadResponse(BaseModel):
     filename: str
     status: str
 
+
+class CreateTranscriptCallRequest(BaseModel):
+    title: str | None = None
+    transcript: str
