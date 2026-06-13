@@ -3,10 +3,42 @@ from typing import Any
 from app.services.llm.base import LLMService
 
 
-GREETING_TERMS = ["hi", "hello", "thanks for joining", "nice to meet", "good morning", "good afternoon"]
-DISCOVERY_TERMS = ["what", "why", "how", "tell me", "walk me through", "problem", "challenge", "goal", "impact"]
-PRICE_TERMS = ["price", "cost", "expensive", "budget", "pricing", "fiyat", "pahali", "pahalı"]
-VALUE_TERMS = ["roi", "return", "value", "impact", "save", "conversion", "pilot", "success metric", "business case"]
+GREETING_TERMS = ["hi", "hello", "thanks for joining", "nice to meet", "good morning", "good afternoon", "merhaba"]
+DISCOVERY_TERMS = [
+    "what",
+    "why",
+    "how",
+    "tell me",
+    "walk me through",
+    "problem",
+    "challenge",
+    "goal",
+    "impact",
+    "ne",
+    "neden",
+    "nasıl",
+    "nasil",
+    "problem",
+    "hedef",
+]
+PRICE_TERMS = ["price", "cost", "expensive", "budget", "pricing", "fiyat", "pahali", "pahalı", "bütçe", "butce"]
+VALUE_TERMS = [
+    "roi",
+    "return",
+    "value",
+    "impact",
+    "save",
+    "conversion",
+    "pilot",
+    "success metric",
+    "business case",
+    "değer",
+    "deger",
+    "yatırım getirisi",
+    "yatirim getirisi",
+    "dönüşüm",
+    "donusum",
+]
 NEXT_STEP_TERMS = [
     "next step",
     "follow up",
@@ -21,6 +53,11 @@ NEXT_STEP_TERMS = [
     "wednesday",
     "thursday",
     "friday",
+    "sonraki adım",
+    "sonraki adim",
+    "takip",
+    "toplantı",
+    "toplanti",
 ]
 VAGUE_RESPONSE_TERMS = [
     "it uses ai",
@@ -38,13 +75,40 @@ VAGUE_RESPONSE_TERMS = [
     "büyük ihtimalle",
     "ai oldugu icin buluyor",
     "ai olduğu için buluyor",
+    "çok pahalı değil",
+    "cok pahali degil",
+    "web sitesine bakarsınız",
+    "web sitesine bakarsiniz",
+]
+TURKISH_MARKERS = [
+    "merhaba",
+    "müşteri",
+    "musteri",
+    "satıcı",
+    "satici",
+    "görüşme",
+    "gorusme",
+    "fiyat",
+    "pahalı",
+    "pahali",
+    "sonraki",
+    "takip",
+    "değer",
+    "deger",
+    "ürün",
+    "urun",
 ]
 
 
 class MockLLMService(LLMService):
     def analyze_sales_call(self, transcript: str) -> dict[str, Any]:
         lower_text = transcript.lower()
-        salesperson_lines = [line for line in transcript.splitlines() if line.lower().startswith("salesperson:")]
+        is_turkish = any(marker in lower_text for marker in TURKISH_MARKERS)
+        salesperson_lines = [
+            line
+            for line in transcript.splitlines()
+            if line.lower().startswith("salesperson:") or line.lower().startswith("satıcı:") or line.lower().startswith("satici:")
+        ]
         question_count = sum(line.count("?") for line in salesperson_lines)
 
         has_opening = any(term in lower_text for term in GREETING_TERMS)
@@ -81,6 +145,52 @@ class MockLLMService(LLMService):
             overall_score = min(overall_score, 52)
         overall_score = max(30, min(overall_score, 92))
 
+        if is_turkish:
+            return self._turkish_response(
+                overall_score,
+                opening_score,
+                discovery_score,
+                objection_score,
+                closing_score,
+                follow_up_score,
+                salesperson_lines,
+                transcript,
+                has_discovery,
+                has_price_objection,
+                has_value_response,
+                has_next_step,
+            )
+
+        return self._english_response(
+            overall_score,
+            opening_score,
+            discovery_score,
+            objection_score,
+            closing_score,
+            follow_up_score,
+            salesperson_lines,
+            transcript,
+            has_discovery,
+            has_price_objection,
+            has_value_response,
+            has_next_step,
+        )
+
+    def _english_response(
+        self,
+        overall_score: int,
+        opening_score: int,
+        discovery_score: int,
+        objection_score: int,
+        closing_score: int,
+        follow_up_score: int,
+        salesperson_lines: list[str],
+        transcript: str,
+        has_discovery: bool,
+        has_price_objection: bool,
+        has_value_response: bool,
+        has_next_step: bool,
+    ) -> dict[str, Any]:
         return {
             "overall_score": overall_score,
             "opening_score": opening_score,
@@ -88,8 +198,10 @@ class MockLLMService(LLMService):
             "objection_handling_score": objection_score,
             "closing_score": closing_score,
             "follow_up_score": follow_up_score,
-            "talk_ratio_feedback": self._talk_ratio_feedback(salesperson_lines, transcript),
-            "top_3_mistakes": self._top_mistakes(has_discovery, has_price_objection, has_value_response, has_next_step),
+            "talk_ratio_feedback": self._english_talk_ratio_feedback(salesperson_lines, transcript),
+            "top_3_mistakes": self._english_top_mistakes(
+                has_discovery, has_price_objection, has_value_response, has_next_step
+            ),
             "missed_questions": [
                 "What specific sales or onboarding problem are you trying to solve first?",
                 "How are you measuring whether call coaching is working today?",
@@ -107,10 +219,60 @@ class MockLLMService(LLMService):
                 "I understand the price concern. If a pilot showed faster ramp time for new reps, would that make the investment easier to justify?",
                 "I will send a sample report today, and we can review it Tuesday with your onboarding metric in mind.",
             ],
-            "short_summary": self._summary(overall_score, has_discovery, has_price_objection, has_value_response, has_next_step),
+            "short_summary": self._english_summary(
+                overall_score, has_discovery, has_price_objection, has_value_response, has_next_step
+            ),
         }
 
-    def _talk_ratio_feedback(self, salesperson_lines: list[str], transcript: str) -> str:
+    def _turkish_response(
+        self,
+        overall_score: int,
+        opening_score: int,
+        discovery_score: int,
+        objection_score: int,
+        closing_score: int,
+        follow_up_score: int,
+        salesperson_lines: list[str],
+        transcript: str,
+        has_discovery: bool,
+        has_price_objection: bool,
+        has_value_response: bool,
+        has_next_step: bool,
+    ) -> dict[str, Any]:
+        return {
+            "overall_score": overall_score,
+            "opening_score": opening_score,
+            "discovery_score": discovery_score,
+            "objection_handling_score": objection_score,
+            "closing_score": closing_score,
+            "follow_up_score": follow_up_score,
+            "talk_ratio_feedback": self._turkish_talk_ratio_feedback(salesperson_lines, transcript),
+            "top_3_mistakes": self._turkish_top_mistakes(
+                has_discovery, has_price_objection, has_value_response, has_next_step
+            ),
+            "missed_questions": [
+                "Bugün çözmeye çalıştığınız en önemli satış veya onboarding problemi nedir?",
+                "Çağrı koçluğunun işe yaradığını hangi metrikle ölçeceksiniz?",
+                "Pilot kararı için başka kimlerin onayı gerekiyor?",
+                "Fiyatın makul görünmesi için hangi değeri veya sonucu kanıtlamamız gerekir?",
+            ],
+            "suggested_improvements": [
+                "Ürün özelliklerini anlatmadan önce müşterinin mevcut sürecini ve problemini keşfedin.",
+                "Değeri dönüşüm, ramp süresi veya koçluk tutarlılığı gibi ölçülebilir bir iş sonucuna bağlayın.",
+                "Fiyat itirazı geldiğinde endişeyi kabul edip ROI, risk azaltma veya düşük riskli pilot çerçevesiyle yanıt verin.",
+                "Görüşmeyi sahip, tarih ve başarı kriteri net olan somut bir sonraki adımla bitirin.",
+            ],
+            "better_example_responses": [
+                "Ürünü anlatmadan önce, bir satış görüşmesinden sonra ekibinizde ne olduğunu adım adım paylaşır mısınız?",
+                "Fiyat endişenizi anlıyorum. Pilot yeni temsilcilerin ramp süresini kısalttığını gösterirse yatırım daha anlamlı olur mu?",
+                "Bugün örnek raporu göndereyim, salı günü onboarding metriğiniz üzerinden birlikte değerlendirelim.",
+            ],
+            "short_summary": self._turkish_summary(
+                overall_score, has_discovery, has_price_objection, has_value_response, has_next_step
+            ),
+        }
+
+    def _english_talk_ratio_feedback(self, salesperson_lines: list[str], transcript: str) -> str:
         total_lines = len([line for line in transcript.splitlines() if line.strip()])
         if total_lines == 0:
             return "Talk ratio cannot be estimated because the transcript is empty."
@@ -119,7 +281,16 @@ class MockLLMService(LLMService):
             return "The salesperson appears to talk more than the customer. Use more discovery questions to create a better listening balance."
         return "The conversation appears reasonably balanced, but real talk ratio requires speaker timing or diarization."
 
-    def _top_mistakes(
+    def _turkish_talk_ratio_feedback(self, salesperson_lines: list[str], transcript: str) -> str:
+        total_lines = len([line for line in transcript.splitlines() if line.strip()])
+        if total_lines == 0:
+            return "Konuşma oranı tahmin edilemiyor çünkü transkript boş."
+        rep_ratio = len(salesperson_lines) / total_lines
+        if rep_ratio > 0.6:
+            return "Satıcı müşteriden daha fazla konuşuyor gibi görünüyor. Daha iyi denge için daha fazla keşif sorusu sormalı."
+        return "Konuşma dengesi makul görünüyor, ancak gerçek konuşma oranı için konuşmacı süreleri veya diarization gerekir."
+
+    def _english_top_mistakes(
         self, has_discovery: bool, has_price_objection: bool, has_value_response: bool, has_next_step: bool
     ) -> list[str]:
         mistakes: list[str] = []
@@ -135,14 +306,27 @@ class MockLLMService(LLMService):
             "The salesperson should ask who is involved in the decision process.",
             "The close should confirm what the customer needs to see before moving forward.",
         ]
-        for backup in backups:
-            if len(mistakes) == 3:
-                break
-            if backup not in mistakes:
-                mistakes.append(backup)
-        return mistakes[:3]
+        return self._fill_three(mistakes, backups)
 
-    def _summary(
+    def _turkish_top_mistakes(
+        self, has_discovery: bool, has_price_objection: bool, has_value_response: bool, has_next_step: bool
+    ) -> list[str]:
+        mistakes: list[str] = []
+        if not has_discovery:
+            mistakes.append("Satıcı çözümü konumlandırmadan önce yeterli keşif sorusu sormadı.")
+        if has_price_objection and not has_value_response:
+            mistakes.append("Fiyat endişesi değer, ROI, risk azaltma veya ölçülebilir bir pilot ile ilişkilendirilmedi.")
+        if not has_next_step:
+            mistakes.append("Görüşme somut bir sonraki adım, sahip, tarih veya başarı kriteri olmadan bitti.")
+
+        backups = [
+            "Ürün anlatımı müşterinin ifade ettiği probleme daha doğrudan bağlanmalı.",
+            "Satıcı karar sürecine kimlerin dahil olduğunu sormalı.",
+            "Kapanışta müşterinin ilerlemek için ne görmesi gerektiği netleştirilmeli.",
+        ]
+        return self._fill_three(mistakes, backups)
+
+    def _english_summary(
         self,
         overall_score: int,
         has_discovery: bool,
@@ -160,3 +344,31 @@ class MockLLMService(LLMService):
                 "This is a decent sales call with useful discovery and follow-up, but the salesperson can make the value case more specific."
             )
         return "This call has useful moments, but the report highlights clear opportunities to improve discovery, value framing, and closing."
+
+    def _turkish_summary(
+        self,
+        overall_score: int,
+        has_discovery: bool,
+        has_price_objection: bool,
+        has_value_response: bool,
+        has_next_step: bool,
+    ) -> str:
+        if overall_score <= 55:
+            return (
+                "Bu zayıf bir satış görüşmesi; satıcı yeterli müşteri bağlamı oluşturmuyor, "
+                "net bir iş gerekçesi kurmuyor ve somut bir sonraki adım almıyor."
+            )
+        if has_price_objection and has_value_response and has_next_step and has_discovery:
+            return (
+                "Bu görüşmede faydalı keşif ve takip unsurları var, ancak satıcı değer önerisini daha somut hale getirmeli."
+            )
+        return "Bu görüşmede iyi anlar var, ancak rapor keşif, değer anlatımı ve kapanışta net gelişim alanları gösteriyor."
+
+    def _fill_three(self, primary_items: list[str], backups: list[str]) -> list[str]:
+        items = list(primary_items)
+        for backup in backups:
+            if len(items) == 3:
+                break
+            if backup not in items:
+                items.append(backup)
+        return items[:3]

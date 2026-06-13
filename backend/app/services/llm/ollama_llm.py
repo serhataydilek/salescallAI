@@ -24,6 +24,8 @@ Ollama output contract:
 - Be strict with scores; do not reward missing discovery, weak objection handling, or no next step.
 - Weak calls with vague product claims, no success metric, and no concrete next step should score in the weak range.
 - Use evidence from the transcript. Do not make the report sound stronger than the actual sales behavior.
+- Match the primary transcript language for all string values. Turkish transcript means Turkish report text; English transcript means English report text.
+- Keep JSON keys in English. Do not translate field names.
 """
 
 

@@ -51,6 +51,10 @@ Output rules:
 - Return strict JSON only.
 - Do not return markdown.
 - Do not return explanations outside JSON.
+- Write all human-readable string values in the same primary language as the transcript.
+- If the transcript is primarily Turkish, return Turkish coaching text.
+- If the transcript is primarily English, return English coaching text.
+- Keep JSON keys in English exactly as specified. Only translate string values inside the JSON.
 - top_3_mistakes must contain exactly 3 items.
 - missed_questions should usually contain 2 to 5 useful questions the salesperson could have asked.
 - suggested_improvements must contain at least 3 useful improvements.

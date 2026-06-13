@@ -1,12 +1,18 @@
 from pathlib import Path
 
 
-GENERIC_FILENAMES = {
+GENERIC_TITLES = {
+    "asd",
+    "asdf",
     "audio",
     "call",
+    "deneme",
+    "manual transcript",
     "recording",
     "sample",
+    "sales call",
     "test",
+    "transcript",
     "untitled",
     "upload",
     "voice",
@@ -22,7 +28,15 @@ def is_generic_call_title(title: str | None) -> bool:
     if not normalized:
         return True
 
-    return normalized in GENERIC_FILENAMES or normalized.startswith("test")
+    compact = normalized.replace(" ", "")
+    if normalized in GENERIC_TITLES or compact in GENERIC_TITLES:
+        return True
+    if compact.startswith("test") and compact[4:].isdigit():
+        return True
+    if len(compact) <= 6 and len(set(compact)) == 1:
+        return True
+
+    return False
 
 
 def generate_call_title(transcript: str, current_title: str | None = None) -> str:
@@ -32,16 +46,19 @@ def generate_call_title(transcript: str, current_title: str | None = None) -> st
     lower_text = transcript.lower()
     title_parts: list[str] = []
 
-    if any(term in lower_text for term in ["price", "cost", "expensive", "budget", "fiyat", "pahali", "pahalı"]):
+    if _contains_any(lower_text, ["price", "cost", "expensive", "budget", "fiyat", "pahali", "pahalı"]):
         title_parts.append("Price Objection")
-    if any(term in lower_text for term in ["pilot", "trial", "demo", "deneme"]):
-        title_parts.append("Pilot Discussion")
-    if any(term in lower_text for term in ["onboarding", "training", "new reps", "new hires", "yeni"]):
-        title_parts.append("Sales Training")
+    if _contains_any(lower_text, ["pilot", "trial", "demo", "deneme"]):
+        title_parts.append("Sales Coaching Pilot Discussion")
+    if _contains_any(
+        lower_text,
+        ["onboarding", "training", "new reps", "new hires", "yeni", "eğitim", "egitim", "oryantasyon"],
+    ):
+        title_parts.append("New Rep Training Workflow Call")
 
-    has_next_step = any(
-        term in lower_text
-        for term in [
+    has_next_step = _contains_any(
+        lower_text,
+        [
             "next step",
             "follow up",
             "follow-up",
@@ -55,11 +72,18 @@ def generate_call_title(transcript: str, current_title: str | None = None) -> st
             "wednesday",
             "thursday",
             "friday",
-        ]
+            "sonraki adım",
+            "sonraki adim",
+            "takip",
+            "toplantı",
+            "toplanti",
+            "görüşelim",
+            "goruselim",
+        ],
     )
-    vague_follow_up = any(
-        term in lower_text
-        for term in [
+    vague_follow_up = _contains_any(
+        lower_text,
+        [
             "you can check the website later",
             "you can get back to me",
             "get back to me",
@@ -67,17 +91,25 @@ def generate_call_title(transcript: str, current_title: str | None = None) -> st
             "siz dönersiniz",
             "sonra bakariz",
             "sonra bakarız",
-        ]
+            "web sitesine bakarsınız",
+            "web sitesine bakarsiniz",
+        ],
     )
     if not has_next_step or vague_follow_up:
         title_parts.append("Weak Follow-up")
 
     question_count = transcript.count("?")
-    if question_count <= 1 or "what kind of problem" in lower_text:
-        title_parts.append("Discovery Gap")
+    if question_count <= 1 or _contains_any(lower_text, ["what kind of problem", "hangi problemi"]):
+        title_parts.append("Discovery Gap in Sales Call")
 
     if not title_parts:
         title_parts.append("Sales Call Analysis")
 
     unique_parts = list(dict.fromkeys(title_parts))
+    if len(unique_parts) == 1:
+        return unique_parts[0][:255]
     return " and ".join(unique_parts[:2])[:255]
+
+
+def _contains_any(text: str, terms: list[str]) -> bool:
+    return any(term in text for term in terms)

@@ -1,0 +1,15 @@
+Satıcı: Merhaba, size SalesMirror ürünümüzü anlatmak istiyorum. Yapay zeka ile satış görüşmelerini analiz ediyor.
+Müşteri: Merhaba, ama sadece birkaç dakikam var.
+Satıcı: Sorun değil. Üründe transkript, puanlama, rapor ve koçluk önerileri var. Kullanması kolay.
+Müşteri: Bizim asıl problemimizi anlamadan ürünü anlatıyorsunuz. Hangi sorunu çözecek?
+Satıcı: Genel olarak satış ekiplerine yardımcı oluyor. Görüşmeleri yüklüyorsunuz, sistem rapor çıkarıyor.
+Müşteri: Yeni temsilcilerin eğitiminde zorlanıyoruz ama bunun bize nasıl değer sağlayacağını anlamadım.
+Satıcı: Yapay zeka olduğu için buluyor. Raporlarda görebilirsiniz.
+Müşteri: Fiyatı ne kadar? Bütçemiz sınırlı.
+Satıcı: Çok pahalı değil, büyük ihtimalle makul olur.
+Müşteri: Başarıyı nasıl ölçeceğiz?
+Satıcı: Raporları görünce anlarsınız.
+Müşteri: Sanırım yöneticimle konuşmam gerekir.
+Satıcı: Tamam, web sitesine bakarsınız. Sonra dönersiniz.
+Müşteri: Peki, teşekkürler.
+Satıcı: Görüşürüz.
