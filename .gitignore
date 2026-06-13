@@ -40,6 +40,8 @@ cache/
 data/eval/results/
 data/eval/*.results.json
 data/eval/*.results.jsonl
+backend/eval_results/*.json
+!backend/eval_results/.gitkeep
 
 # OS/editor
 .DS_Store

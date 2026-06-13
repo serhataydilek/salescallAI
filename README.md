@@ -187,6 +187,48 @@ The script loads `data/samples/price_objection_sales_call.txt`, calls the Ollama
 
 7. Test from the frontend by uploading a call, transcribing it, and clicking `Analyze`.
 
+## Comparing Local Ollama Models
+
+Pull the local models you want to compare:
+
+```powershell
+ollama pull qwen2.5:7b
+ollama pull dolphin-llama3:latest
+```
+
+Run the backend-only comparison script:
+
+```powershell
+cd C:\Users\serfu\OneDrive\Desktop\projects\salescall\salesmirror\backend
+.\.venv\Scripts\Activate.ps1
+python scripts\compare_ollama_models.py qwen2.5:7b dolphin-llama3:latest
+```
+
+The script reads transcripts from `data/samples/`, calls each model through the Ollama provider, validates every output with the SalesMirror schema, prints a terminal comparison report, and saves local results to:
+
+```text
+backend/eval_results/ollama_model_comparison.json
+```
+
+Generated evaluation result JSON files are ignored by git because future results may contain private transcript text or model output.
+
+Use [docs/model_review_template.md](docs/model_review_template.md) to manually compare:
+
+- JSON reliability
+- sales reasoning quality
+- objection detection
+- discovery-question detection
+- closing and follow-up detection
+- usefulness of suggested improvements
+- Turkish and English understanding
+- report readability
+
+Choose the default model by setting `OLLAMA_MODEL` in `backend/.env`:
+
+```env
+OLLAMA_MODEL=qwen2.5:7b
+```
+
 ## Testing faster-whisper Locally
 
 Install optional local transcription dependencies:
