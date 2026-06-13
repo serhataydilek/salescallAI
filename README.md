@@ -254,6 +254,58 @@ python scripts\test_faster_whisper_transcription.py C:\path\to\audio.webm
 
 The script calls the faster-whisper provider directly, prints the transcript, and prints `PASS` or `FAIL`.
 
+## Testing the Full Local AI Pipeline
+
+The app still defaults to mock providers unless you change `backend/.env`. The scripts below call the real local providers directly for testing.
+
+Install local AI dependencies:
+
+```powershell
+cd C:\Users\serfu\OneDrive\Desktop\projects\salescall\salesmirror\backend
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements-local-ai.txt
+```
+
+Make sure Ollama is running and the recommended model is pulled:
+
+```powershell
+ollama pull qwen2.5:7b
+ollama serve
+```
+
+Recommended `backend/.env` for the app when testing real local AI end to end:
+
+```env
+USE_MOCK_TRANSCRIPTION=false
+USE_MOCK_LLM=false
+WHISPER_MODEL_SIZE=base
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_MODEL=qwen2.5:7b
+```
+
+Run the faster-whisper transcription smoke test with a short real audio file:
+
+```powershell
+python scripts\test_faster_whisper_transcription.py C:\path\to\short-audio.webm
+```
+
+Run the full local AI pipeline smoke test:
+
+```powershell
+python scripts\test_local_ai_pipeline.py C:\path\to\short-audio.webm
+```
+
+The full pipeline script transcribes the audio with faster-whisper, analyzes the transcript with Ollama, validates the SalesMirror schema, and prints the transcript plus the key coaching report fields.
+
+After the backend-only scripts pass, test from the frontend:
+
+1. Start the backend with the real local AI `.env` values above.
+2. Start the frontend.
+3. Upload the same short audio file.
+4. Click `Transcribe`.
+5. Click `Analyze`.
+6. Review the call report.
+
 ## Backend Endpoints
 
 - `POST /calls/upload`

@@ -34,6 +34,14 @@ backend/storage/uploads/*
 backend/app/storage/uploads/*
 !backend/app/storage/uploads/.gitkeep
 
+# Local test audio and recordings
+*.mp3
+*.wav
+*.m4a
+*.webm
+*.aac
+*.ogg
+
 # Local caches and evaluation outputs
 .cache/
 cache/

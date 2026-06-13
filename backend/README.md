@@ -56,6 +56,12 @@ Test faster-whisper transcription without the frontend:
 python scripts\test_faster_whisper_transcription.py C:\path\to\audio.webm
 ```
 
+Test the full local AI pipeline without the frontend:
+
+```powershell
+python scripts\test_local_ai_pipeline.py C:\path\to\audio.webm
+```
+
 ## Seed Demo Data
 
 ```powershell
