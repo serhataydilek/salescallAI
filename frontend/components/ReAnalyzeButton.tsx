@@ -16,6 +16,7 @@ export function ReAnalyzeButton({ callId }: { callId: number }) {
     try {
       await analyzeCall(callId);
       router.refresh();
+      window.location.assign(`/calls/${callId}?reanalyzed=${Date.now()}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not re-run analysis.");
     } finally {
@@ -26,7 +27,7 @@ export function ReAnalyzeButton({ callId }: { callId: number }) {
   return (
     <div className="reanalyze-control">
       <button disabled={isAnalyzing} onClick={handleReAnalyze} type="button">
-        {isAnalyzing ? "Analyzing updated transcript..." : "Re-run Analysis"}
+        {isAnalyzing ? "Re-analyzing..." : "Re-run Analysis"}
       </button>
       {error ? <div className="message error">{error}</div> : null}
     </div>

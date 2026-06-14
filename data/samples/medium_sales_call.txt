@@ -1,0 +1,11 @@
+Salesperson: Hi, thanks for taking the call. I wanted to understand how your team reviews sales calls and see whether SalesMirror might help.
+Customer: Sure. We are looking at options, but budget is tight.
+Salesperson: What made you look at coaching tools right now?
+Customer: New reps are missing follow-ups and managers spend a lot of time reviewing recordings.
+Salesperson: How does that affect onboarding or conversion?
+Customer: Ramp time is slower than we want, and managers do not review calls consistently.
+Salesperson: SalesMirror can create a first-pass coaching report with scores, missed questions, and suggested responses so managers have a better starting point.
+Customer: That sounds useful, but I am not sure the team will trust an automated score.
+Salesperson: That is fair. A small pilot could compare the reports against manager notes before any broader rollout.
+Customer: I would need to discuss it with my manager.
+Salesperson: Makes sense. I can send you a sample report and you can let me know if it is worth a deeper conversation.

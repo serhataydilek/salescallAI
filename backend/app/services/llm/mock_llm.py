@@ -59,6 +59,39 @@ NEXT_STEP_TERMS = [
     "toplantı",
     "toplanti",
 ]
+CONCRETE_NEXT_STEP_TERMS = [
+    "next step",
+    "schedule",
+    "calendar",
+    "meet next",
+    "review it with",
+    "book a review",
+    "tomorrow",
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "by the end of today",
+    "sonraki adÄ±m",
+    "sonraki adim",
+    "toplantÄ±",
+    "toplanti",
+]
+SUCCESS_TERMS = [
+    "success criteria",
+    "success metric",
+    "pilot criteria",
+    "measure",
+    "measurable",
+    "criteria",
+    "scorecard",
+    "baÅŸarÄ± kriteri",
+    "basari kriteri",
+    "metrik",
+    "Ã¶lÃ§",
+    "olc",
+]
 VAGUE_RESPONSE_TERMS = [
     "it uses ai",
     "ai products usually expensive",
@@ -79,6 +112,47 @@ VAGUE_RESPONSE_TERMS = [
     "cok pahali degil",
     "web sitesine bakarsınız",
     "web sitesine bakarsiniz",
+]
+DO_NOT_CONTACT_TERMS = [
+    "do not call again",
+    "please don't call again",
+    "don't call this number again",
+    "do not contact me",
+    "don't contact me",
+    "tekrar aramayÄ±n",
+    "tekrar aramayin",
+    "beni aramayÄ±n",
+    "beni aramayin",
+]
+UNPREPARED_TERMS = [
+    "just woke up",
+    "haven't had coffee",
+    "forgot",
+    "forgetting",
+    "i keep forgetting",
+    "marketing team wrote",
+    "i don't know pricing",
+    "do not know pricing",
+    "have not figured that out",
+    "need to get back to you on that",
+    "let me google",
+    "google it",
+    "website up",
+]
+QUOTA_PRESSURE_TERMS = [
+    "hot lead",
+    "quota",
+    "quota resets",
+    "my quota",
+]
+REFERRAL_TERMS = ["colleagues", "referral", "refer", "anyone else", "might be interested"]
+TIME_CONSTRAINT_TERMS = [
+    "only have a few minutes",
+    "another meeting",
+    "meeting in two minutes",
+    "don't have much time",
+    "sadece birkaÃ§ dakikam var",
+    "sadece birkac dakikam var",
 ]
 TURKISH_MARKERS = [
     "merhaba",
@@ -115,8 +189,19 @@ class MockLLMService(LLMService):
         has_discovery = question_count >= 2 and any(term in lower_text for term in DISCOVERY_TERMS)
         has_price_objection = any(term in lower_text for term in PRICE_TERMS)
         has_value_response = any(term in lower_text for term in VALUE_TERMS)
-        has_next_step = any(term in lower_text for term in NEXT_STEP_TERMS)
+        has_next_step = any(term in lower_text for term in CONCRETE_NEXT_STEP_TERMS)
+        has_success_criteria = any(term in lower_text for term in SUCCESS_TERMS)
         has_vague_response = any(term in lower_text for term in VAGUE_RESPONSE_TERMS)
+        critical_flags = {
+            "do_not_contact": any(term in lower_text for term in DO_NOT_CONTACT_TERMS),
+            "unprepared": any(term in lower_text for term in UNPREPARED_TERMS),
+            "quota_pressure": any(term in lower_text for term in QUOTA_PRESSURE_TERMS),
+            "ignored_time_constraint": any(term in lower_text for term in TIME_CONSTRAINT_TERMS)
+            and any(term in lower_text for term in ["this won't take long", "one last thing", "hot lead"]),
+        }
+        asks_referral_after_rejection = critical_flags["do_not_contact"] and any(
+            term in lower_text for term in REFERRAL_TERMS
+        )
 
         opening_score = 82 if has_opening else 45
         discovery_score = 78 if has_discovery else 35
@@ -131,19 +216,50 @@ class MockLLMService(LLMService):
         closing_score = 76 if has_next_step else 38
         follow_up_score = 78 if has_next_step else 35
 
+        is_strong_call = (
+            has_opening
+            and has_discovery
+            and has_value_response
+            and has_next_step
+            and has_success_criteria
+            and not has_vague_response
+            and not any(critical_flags.values())
+        )
+        if is_strong_call:
+            opening_score = max(opening_score, 86)
+            discovery_score = max(discovery_score, 88)
+            objection_score = max(objection_score, 84)
+            closing_score = max(closing_score, 86)
+            follow_up_score = max(follow_up_score, 88)
+
         if has_vague_response:
             discovery_score = min(discovery_score, 50)
             closing_score = min(closing_score, 48)
             follow_up_score = min(follow_up_score, 45)
+        if critical_flags["ignored_time_constraint"]:
+            closing_score = min(closing_score, 5)
+            follow_up_score = min(follow_up_score, 5)
+        if asks_referral_after_rejection:
+            follow_up_score = 0
 
         overall_score = round(
             (opening_score + discovery_score + objection_score + closing_score + follow_up_score) / 5
         )
+        if is_strong_call:
+            overall_score = max(overall_score, 85)
         if not has_discovery or not has_next_step or (has_price_objection and not has_value_response):
             overall_score = min(overall_score, 55)
         if has_vague_response:
             overall_score = min(overall_score, 52)
-        overall_score = max(30, min(overall_score, 92))
+        if critical_flags["do_not_contact"]:
+            overall_score = min(overall_score, 20)
+        if critical_flags["unprepared"] or critical_flags["quota_pressure"]:
+            overall_score = min(overall_score, 25)
+        if sum(1 for flag in critical_flags.values() if flag) >= 2:
+            overall_score = min(overall_score, 20)
+        overall_score = min(overall_score, 92)
+        if not any(critical_flags.values()):
+            overall_score = max(30, overall_score)
 
         if is_turkish:
             return self._turkish_response(

@@ -23,6 +23,9 @@ Ollama output contract:
 - short_summary must be specific to this transcript, not generic.
 - Be strict with scores; do not reward missing discovery, weak objection handling, or no next step.
 - Weak calls with vague product claims, no success metric, and no concrete next step should score in the weak range.
+- Strong calls with discovery before pitching, confirmed pain, value framing, pilot or objection framing, success criteria, and a concrete next meeting should usually score 80-90.
+- Brand-damaging calls with do-not-contact requests, unprepared behavior, quota pressure, ignored time constraints, or referral asks after rejection must be capped according to the rubric.
+- A catastrophic call must not receive 40+ just because the salesperson asked one basic question.
 - Use evidence from the transcript. Do not make the report sound stronger than the actual sales behavior.
 - Match the primary transcript language for all string values. Turkish transcript means Turkish report text; English transcript means English report text.
 - Keep JSON keys in English. Do not translate field names.

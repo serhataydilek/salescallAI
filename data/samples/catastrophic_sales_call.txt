@@ -1,0 +1,15 @@
+Salesperson: Yeah hi, is this Dave? Derek? Something with a D?
+Customer: It's Sandra.
+Salesperson: Right, Sandra. Cool. I just woke up like twenty minutes ago and I have not had coffee yet, so bear with me.
+Customer: What is this regarding?
+Salesperson: Software. It does a lot of stuff. Honestly our marketing team wrote the bullet points and I keep forgetting them.
+Customer: What kind of software? We already use a CRM.
+Salesperson: Ours is like a CRM but better. Probably. What CRM do you use?
+Customer: Salesforce.
+Salesperson: Oof. Salesforce is terrible. I actually use it myself and kind of like it, but ours is way better.
+Customer: What does it cost?
+Salesperson: Great question. I need to get back to you on that. Or you could go to our website. Actually, let me Google it real quick.
+Customer: I have another meeting in two minutes.
+Salesperson: Perfect, this will not take long. Can I put you down as a hot lead? My quota resets Friday and things are not looking great.
+Customer: Please don't call this number again.
+Salesperson: Totally fair. One last thing, do you have any colleagues who might be interested?

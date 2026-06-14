@@ -30,10 +30,11 @@ Evaluate these areas:
 - talk ratio feedback: provide a qualitative estimate only unless speaker timing is available
 
 Scoring scale:
-- 80-100: strong call
+- 80-100: strong call with clear discovery, value framing, objection handling, and concrete next step
 - 60-79: decent call with clear improvement areas
-- 40-59: weak call with major gaps
-- 0-39: very poor call
+- 40-59: weak but salvageable call with major gaps
+- 20-39: very poor call with major coaching needs
+- 0-19: brand-damaging or catastrophic call
 
 Scoring rules:
 - Avoid being too generous. Score based on evidence in the transcript.
@@ -46,6 +47,14 @@ Scoring rules:
 - If the salesperson avoids defining success measurements, closing_score and follow_up_score should be low even if the tone is polite.
 - If a price objection is answered with "it is not expensive" or "AI products are usually expensive" without ROI, risk, value, or pilot framing, objection_handling_score must be low.
 - If the call is strong, still identify minor but useful coaching improvements instead of inventing severe mistakes.
+- A call should score 80 or higher only when the salesperson asks discovery before pitching, confirms customer pain, connects the product to that pain, handles objections with value or pilot framing, defines success criteria, and sets a concrete next meeting or action.
+- Do not inflate weak calls because the salesperson asked one basic question.
+- If the customer says "do not call again", "please don't call again", "do not contact me", "don't call this number again", or Turkish equivalents such as "tekrar aramayÄ±n", overall_score must be 0-20.
+- If the salesperson admits being unprepared, says they just woke up, forgot product points, does not know pricing, cannot explain the product, or Googles their own website during the call, overall_score must usually be 0-25.
+- If the salesperson mentions quota pressure, asks to mark the prospect as a hot lead for quota, or makes the customer responsible for their quota, overall_score must usually be 0-25.
+- If the salesperson asks for referrals after the customer rejects the call or says not to call again, follow_up_score must be 0.
+- If the salesperson ignores a customer time constraint, closing_score and follow_up_score must be 0-5.
+- If multiple critical failures occur in the same call, overall_score must be 0-20.
 
 Output rules:
 - Return strict JSON only.
