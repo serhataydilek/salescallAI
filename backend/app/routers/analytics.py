@@ -27,6 +27,10 @@ CATEGORY_LABELS = {
 
 @router.get("/summary", response_model=AnalyticsSummaryOut)
 def analytics_summary(db: Session = Depends(get_db)) -> AnalyticsSummaryOut:
+    return build_analytics_summary(db)
+
+
+def build_analytics_summary(db: Session) -> AnalyticsSummaryOut:
     calls = list(
         db.scalars(
             select(Call)

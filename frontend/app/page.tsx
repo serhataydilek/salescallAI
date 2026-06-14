@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { type AnalyticsSummary, getAnalyticsSummary } from "@/lib/api";
+import { analyticsJsonExportUrl, type AnalyticsSummary, getAnalyticsSummary } from "@/lib/api";
 
 function formatScore(score: number | null): string {
   return score === null ? "No data" : `${score.toFixed(1)}/100`;
@@ -139,6 +139,9 @@ export default async function DashboardPage() {
           <Link className="button secondary" href="/calls">
             View All Calls
           </Link>
+          <a className="button secondary" href={analyticsJsonExportUrl()}>
+            Download Analytics JSON
+          </a>
         </div>
       </section>
 

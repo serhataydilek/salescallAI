@@ -236,3 +236,15 @@ export function analyzeCall(id: number): Promise<Analysis> {
 export function reportUrl(id: number): string {
   return `${API_BASE_URL}/calls/${id}/report.txt`;
 }
+
+export function callsJsonExportUrl(): string {
+  return `${API_BASE_URL}/exports/calls.json`;
+}
+
+export function callsCsvExportUrl(): string {
+  return `${API_BASE_URL}/exports/calls.csv`;
+}
+
+export function analyticsJsonExportUrl(): string {
+  return `${API_BASE_URL}/exports/analytics.json`;
+}

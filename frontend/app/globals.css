@@ -418,6 +418,12 @@ textarea {
   padding: 18px;
 }
 
+.export-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .filter-panel .field:first-child {
   grid-column: span 2;
 }

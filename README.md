@@ -461,6 +461,15 @@ The home dashboard summarizes local coaching activity across calls:
 - Score trend uses the latest analyzed calls and shows whether scores improved, declined, or stayed unchanged.
 - No external analytics provider or charting dependency is used.
 
+## Exporting Local Data
+
+SalesMirror supports local exports without external integrations:
+
+- Calls can be exported as JSON or CSV from the calls page.
+- Analytics can be exported as JSON from the dashboard.
+- Audio files are not embedded in exports; call exports include metadata and transcript/report data only.
+- Exports are useful before clearing local calls or moving data elsewhere.
+
 ## Deleting Calls
 
 Use `Delete Call` from the call list or report page to remove one selected local call. This deletes the call record, transcript, analysis, and the uploaded audio file when that file is inside `backend/storage/uploads/`.

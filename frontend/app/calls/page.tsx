@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { CallList } from "@/components/CallList";
 import { ClearCallsButton } from "@/components/ClearCallsButton";
-import { type Call, type CallFilters, getCalls } from "@/lib/api";
+import { callsCsvExportUrl, callsJsonExportUrl, type Call, type CallFilters, getCalls } from "@/lib/api";
 
 type CallsPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -77,6 +77,15 @@ export default async function CallsPage({ searchParams }: CallsPageProps) {
         <Link className="button" href="/upload">
           Upload
         </Link>
+      </div>
+
+      <div className="export-actions">
+        <a className="button secondary" href={callsJsonExportUrl()}>
+          Download Calls JSON
+        </a>
+        <a className="button secondary" href={callsCsvExportUrl()}>
+          Download Calls CSV
+        </a>
       </div>
 
       <form action="/calls" className="filter-panel">
