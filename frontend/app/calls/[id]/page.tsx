@@ -43,6 +43,39 @@ function ScoreCard({ label, value }: { label: string; value: number }) {
   );
 }
 
+function AssistantCoaching({ cards }: { cards: Analysis["assistant_coaching_cards"] }) {
+  if (cards.length === 0) {
+    return null;
+  }
+
+  return (
+    <section className="report-section assistant-coaching-section">
+      <div className="section-heading">
+        <span className="eyebrow">Assistant Coaching</span>
+        <h2>Try These Rewrites</h2>
+      </div>
+      <div className="assistant-card-grid">
+        {cards.map((card) => (
+          <article className="assistant-card" key={`${card.issue}-${card.try_saying_this}`}>
+            <div>
+              <span>Moment / Issue</span>
+              <p>{card.issue}</p>
+            </div>
+            <div>
+              <span>Why it matters</span>
+              <p>{card.why_it_matters}</p>
+            </div>
+            <div className="try-saying">
+              <span>Try saying this instead</span>
+              <p>&ldquo;{card.try_saying_this}&rdquo;</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function SourceMeta({ label, value }: { label: string; value: string }) {
   return (
     <div className="report-meta-item">
@@ -166,6 +199,8 @@ export default async function CallDetailPage({ params }: PageProps) {
               <ScoreCard label="Follow Up" value={analysis.follow_up_score} />
             </div>
           </section>
+
+          <AssistantCoaching cards={analysis.assistant_coaching_cards} />
 
           <section className="report-section">
             <div className="section-heading">

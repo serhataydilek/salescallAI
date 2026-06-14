@@ -65,9 +65,11 @@ def test_analyze_flow_updates_existing_analysis(client):
         "missed_questions",
         "suggested_improvements",
         "better_example_responses",
+        "assistant_coaching_cards",
         "short_summary",
     ]:
         assert field in first_analysis
+    assert len(first_analysis["assistant_coaching_cards"]) >= 3
 
     call_response = client.get(f"/calls/{call['id']}")
     assert call_response.status_code == 200
@@ -103,6 +105,8 @@ def test_transcript_edit_marks_stale_and_reanalysis_reuses_analysis(client):
     report_response = client.get(f"/calls/{call['id']}/report.txt")
     assert report_response.status_code == 200
     assert "pilot plan before buying" in report_response.text
+    assert "## Assistant Coaching" in report_response.text
+    assert "Try saying this instead" in report_response.text
 
 
 def test_delete_selected_call_cascades_and_keeps_other_calls(client):

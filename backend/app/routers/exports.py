@@ -12,6 +12,7 @@ from app.database import get_db
 from app.models import Analysis, Call
 from app.routers.analytics import build_analytics_summary
 from app.routers.calls import MANUAL_TRANSCRIPT_FILE_PATH
+from app.services.assistant_coaching import build_assistant_coaching_cards
 
 
 router = APIRouter(prefix="/exports", tags=["exports"])
@@ -92,6 +93,7 @@ def _call_export(call: Call) -> dict[str, Any]:
 
 
 def _analysis_export(analysis: Analysis) -> dict[str, Any]:
+    transcript = analysis.call.transcript.text if analysis.call and analysis.call.transcript else None
     return {
         "overall_score": analysis.overall_score,
         "opening_score": analysis.opening_score,
@@ -104,6 +106,14 @@ def _analysis_export(analysis: Analysis) -> dict[str, Any]:
         "missed_questions": analysis.missed_questions,
         "suggested_improvements": analysis.suggested_improvements,
         "better_example_responses": analysis.better_example_responses,
+        "assistant_coaching_cards": [
+            {
+                "issue": card.issue,
+                "why_it_matters": card.why_it_matters,
+                "try_saying_this": card.try_saying_this,
+            }
+            for card in build_assistant_coaching_cards(analysis, transcript)
+        ],
         "short_summary": analysis.short_summary,
         "created_at": _iso(analysis.created_at),
     }

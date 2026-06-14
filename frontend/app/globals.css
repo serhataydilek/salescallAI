@@ -883,6 +883,45 @@ pre {
   margin-bottom: 0;
 }
 
+.assistant-card-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.assistant-card {
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+}
+
+.assistant-card span {
+  color: var(--primary-dark);
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+
+.assistant-card p {
+  color: var(--text);
+}
+
+.try-saying {
+  background: #ffffff;
+  border-left: 4px solid var(--success);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.try-saying p {
+  font-weight: 700;
+}
+
 .block-heading {
   align-items: center;
   display: flex;
@@ -1014,6 +1053,10 @@ li {
     grid-template-columns: 1fr;
   }
 
+  .assistant-card-grid {
+    grid-template-columns: 1fr;
+  }
+
   .overall-score {
     font-size: 56px;
   }
@@ -1098,7 +1141,9 @@ li {
   .report-meta-item,
   .score,
   .score-hero-main,
-  .talk-ratio-box {
+  .talk-ratio-box,
+  .assistant-card,
+  .try-saying {
     background: #ffffff;
     border: 1px solid #d1d5db;
   }

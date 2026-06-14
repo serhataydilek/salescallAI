@@ -1,6 +1,8 @@
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
-from app.schemas import AnalysisBase
+if TYPE_CHECKING:
+    from app.schemas import AnalysisBase
 
 
 DO_NOT_CONTACT_TERMS = [
@@ -284,7 +286,9 @@ def detect_sales_quality_signals(transcript: str) -> SalesQualitySignals:
     )
 
 
-def calibrate_analysis(transcript: str, analysis: AnalysisBase) -> AnalysisBase:
+def calibrate_analysis(transcript: str, analysis: "AnalysisBase") -> "AnalysisBase":
+    from app.schemas import AnalysisBase
+
     data = analysis.model_dump()
     critical_signals = detect_critical_failures(transcript)
     if critical_signals.is_catastrophic:

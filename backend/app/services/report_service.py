@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from app.models import Call
+from app.services.assistant_coaching import AssistantCoachingCard, build_assistant_coaching_cards
 
 
 SECTION_SEPARATOR = "-" * 72
@@ -23,6 +24,7 @@ class ReportService:
 
         analysis = call.analysis
         transcript = call.transcript.text if call.transcript else "Transcript is not available."
+        assistant_cards = build_assistant_coaching_cards(analysis, transcript)
         source_type = self._source_type(call.file_path)
         source_detail = self._source_detail(call.file_path)
 
@@ -57,6 +59,10 @@ class ReportService:
             "## Coaching Opportunities",
             SECTION_SEPARATOR,
             *self._numbered_items(analysis.top_3_mistakes),
+            "",
+            "## Assistant Coaching",
+            SECTION_SEPARATOR,
+            *self._assistant_card_items(assistant_cards),
             "",
             "## Missed Questions",
             SECTION_SEPARATOR,
@@ -93,3 +99,18 @@ class ReportService:
         if not items:
             return ["None provided."]
         return [f"{index}. {item}" for index, item in enumerate(items, start=1)]
+
+    def _assistant_card_items(self, cards: list[AssistantCoachingCard]) -> list[str]:
+        if not cards:
+            return ["None provided."]
+
+        lines: list[str] = []
+        for index, card in enumerate(cards, start=1):
+            lines.extend(
+                [
+                    f"{index}. Moment / Issue: {card.issue}",
+                    f"   Why it matters: {card.why_it_matters}",
+                    f"   Try saying this instead: {card.try_saying_this}",
+                ]
+            )
+        return lines

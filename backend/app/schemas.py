@@ -1,7 +1,9 @@
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, computed_field
+
+from app.services.assistant_coaching import build_assistant_coaching_cards
 
 
 class TranscriptOut(BaseModel):
@@ -28,12 +30,30 @@ class AnalysisBase(BaseModel):
     short_summary: str
 
 
+class AssistantCoachingCardOut(BaseModel):
+    issue: str
+    why_it_matters: str
+    try_saying_this: str
+
+
 class AnalysisOut(AnalysisBase):
     id: int
     call_id: int
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+    @computed_field
+    @property
+    def assistant_coaching_cards(self) -> list[AssistantCoachingCardOut]:
+        return [
+            AssistantCoachingCardOut(
+                issue=card.issue,
+                why_it_matters=card.why_it_matters,
+                try_saying_this=card.try_saying_this,
+            )
+            for card in build_assistant_coaching_cards(self)
+        ]
 
 
 class CallOut(BaseModel):

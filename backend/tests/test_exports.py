@@ -54,6 +54,8 @@ def test_calls_json_export_includes_calls_transcripts_and_analysis(client):
     assert exported["transcript"] == "Salesperson: What would make this useful?"
     assert exported["analysis"]["overall_score"] == 74
     assert exported["analysis"]["short_summary"] == "Useful call with some coaching gaps."
+    assert len(exported["analysis"]["assistant_coaching_cards"]) >= 3
+    assert exported["analysis"]["assistant_coaching_cards"][0]["try_saying_this"]
 
 
 def test_calls_csv_export_returns_expected_headers_and_rows(client):

@@ -44,6 +44,11 @@ export type Analysis = {
   missed_questions: string[];
   suggested_improvements: string[];
   better_example_responses: string[];
+  assistant_coaching_cards: {
+    issue: string;
+    why_it_matters: string;
+    try_saying_this: string;
+  }[];
   short_summary: string;
   created_at: string;
 };
