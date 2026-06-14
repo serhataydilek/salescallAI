@@ -498,12 +498,13 @@ textarea {
   border: 1px solid var(--border);
   border-radius: 8px;
   display: grid;
-  gap: 16px;
+  gap: 14px;
   padding: 18px;
 }
 
 .calls-filter-panel {
   align-items: stretch;
+  box-shadow: 0 1px 0 rgba(23, 32, 42, 0.03);
 }
 
 .export-actions {
@@ -512,17 +513,24 @@ textarea {
   gap: 10px;
 }
 
+.calls-search-row {
+  align-items: end;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
 .calls-search-field input {
   background: #ffffff;
   font-size: 16px;
-  min-height: 46px;
+  min-height: 50px;
 }
 
 .filter-grid {
   align-items: end;
   display: grid;
-  gap: 14px;
-  grid-template-columns: minmax(140px, 0.8fr) minmax(150px, 0.9fr) minmax(230px, 1.2fr) minmax(160px, 0.9fr) auto;
+  gap: 12px;
+  grid-template-columns: repeat(4, minmax(150px, 1fr));
 }
 
 .filter-actions {
@@ -533,6 +541,7 @@ textarea {
 }
 
 .score-range-control {
+  background: #ffffff;
   border: 1px solid var(--border);
   border-radius: 8px;
   margin: 0;
@@ -566,9 +575,11 @@ textarea {
 
 .active-filters {
   align-items: center;
+  border-top: 1px solid var(--border);
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  padding-top: 12px;
 }
 
 .active-filters span {
@@ -579,10 +590,10 @@ textarea {
 }
 
 .active-filters strong {
-  background: #eaf4ff;
-  border: 1px solid #b5d7f5;
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
   border-radius: 999px;
-  color: var(--primary-dark);
+  color: var(--muted);
   font-size: 13px;
   padding: 5px 9px;
 }
@@ -1171,6 +1182,7 @@ li {
   }
 
   .filter-panel,
+  .calls-search-row,
   .filter-grid {
     grid-template-columns: 1fr;
   }

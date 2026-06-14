@@ -16,9 +16,17 @@ function scoreLabel(score: number): string {
   if (score >= 40) return "Weak call";
   return "Poor call";
 }
+
+function scoreClass(score: number): string {
+  if (score >= 80) return "score-strong";
+  if (score >= 60) return "score-decent";
+  if (score >= 40) return "score-weak";
+  return "score-poor";
+}
+
 export function CallList({
   calls,
-  emptyMessage = "Upload a call or seed demo data to see the coaching report workflow.",
+  emptyMessage = "Analyze a call or seed demo data to see the coaching report workflow.",
   showUploadAction = true,
 }: {
   calls: Call[];
@@ -32,7 +40,7 @@ export function CallList({
         <p>{emptyMessage}</p>
         {showUploadAction ? (
           <Link className="button" href="/upload">
-            Upload First Call
+            Analyze First Call
           </Link>
         ) : null}
       </div>
@@ -46,12 +54,12 @@ export function CallList({
           <div className="call-card-top">
             <div>
               <h3>{call.filename}</h3>
-              <div className="meta">Uploaded {new Date(call.created_at).toLocaleString()}</div>
+              <div className="meta">Created {new Date(call.created_at).toLocaleString()}</div>
             </div>
             <div className="call-card-badges">
               <span className={`status ${call.status}`}>{call.status}</span>
               {call.overall_score !== null ? (
-                <div className={`call-score score-${scoreLabel(call.overall_score).split(" ")[0].toLowerCase()}`}>
+                <div className={`call-score ${scoreClass(call.overall_score)}`} aria-label="Overall score">
                   <strong>{call.overall_score}</strong>
                   <span>{scoreLabel(call.overall_score)}</span>
                 </div>

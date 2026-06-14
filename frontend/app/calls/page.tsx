@@ -74,7 +74,7 @@ export default async function CallsPage({ searchParams }: CallsPageProps) {
       <div className="call-card-top">
         <div>
           <h1>Calls</h1>
-          <p>All uploaded calls in local storage.</p>
+          <p>All local call records, transcripts, and coaching reports.</p>
         </div>
         <Link className="button" href="/upload">
           Upload
@@ -102,16 +102,19 @@ export default async function CallsPage({ searchParams }: CallsPageProps) {
       </details>
 
       <form action="/calls" className="filter-panel calls-filter-panel">
-        <label className="field calls-search-field">
-          <span>Search calls</span>
-          <input
-            defaultValue={filters.q ?? ""}
-            name="q"
-            placeholder="Title or transcript text"
-            type="search"
-          />
-        </label>
-        <div className="filter-grid">
+        <div className="calls-search-row">
+          <label className="field calls-search-field">
+            <span>Search calls</span>
+            <input defaultValue={filters.q ?? ""} name="q" placeholder="Title or transcript text" type="search" />
+          </label>
+          <div className="filter-actions">
+            <button type="submit">Apply</button>
+            <Link className="button secondary" href="/calls">
+              Reset
+            </Link>
+          </div>
+        </div>
+        <div className="filter-grid" aria-label="Call filters">
           <label className="field">
             <span>Status</span>
             <select defaultValue={filters.status ?? ""} name="status">
@@ -154,12 +157,6 @@ export default async function CallsPage({ searchParams }: CallsPageProps) {
               ))}
             </select>
           </label>
-          <div className="filter-actions">
-            <button type="submit">Apply</button>
-            <Link className="button secondary" href="/calls">
-              Reset
-            </Link>
-          </div>
         </div>
         {activeFilters.length > 0 ? (
           <div className="active-filters">
