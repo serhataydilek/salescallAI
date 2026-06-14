@@ -89,6 +89,9 @@ function sourceLabel(filePath: string): string {
   if (filePath === "manual-transcript") {
     return "Pasted transcript";
   }
+  if (filePath === "restored-audio-file-not-included") {
+    return "Audio metadata only; file not restored";
+  }
 
   const pathParts = filePath.split(/[/\\]/);
   const storedName = pathParts[pathParts.length - 1] ?? "";

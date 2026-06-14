@@ -40,6 +40,27 @@ const statusLabels: Record<WorkflowStatus, string> = {
   failed: "Failed",
 };
 
+const MIN_LOADING_SCREEN_MS = 1200;
+
+function wait(ms: number): Promise<void> {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+function waitForLoadingPaint(): Promise<void> {
+  return new Promise((resolve) => {
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => resolve());
+    });
+  });
+}
+
+async function keepLoadingVisible(startedAt: number): Promise<void> {
+  const remaining = MIN_LOADING_SCREEN_MS - (Date.now() - startedAt);
+  if (remaining > 0) {
+    await wait(remaining);
+  }
+}
+
 export default function UploadPage() {
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
@@ -48,6 +69,7 @@ export default function UploadPage() {
   const [status, setStatus] = useState<WorkflowStatus>("idle");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [transcriptError, setTranscriptError] = useState("");
   const [action, setAction] = useState<ActionState>("idle");
   const [loadingStepIndex, setLoadingStepIndex] = useState(0);
 
@@ -72,19 +94,23 @@ export default function UploadPage() {
     const validationError = validateAudioFile(selectedFile);
     if (validationError) {
       setError(validationError);
+      setTranscriptError("");
       setMessage("");
       setStatus("failed");
       return;
     }
     if (!selectedFile) return;
 
+    const startedAt = Date.now();
     setAction("audio");
     setError("");
+    setTranscriptError("");
     setMessage("");
     setStatus("uploaded");
+    setLoadingStepIndex(0);
 
     try {
-      setLoadingStepIndex(0);
+      await waitForLoadingPaint();
       const uploaded = await uploadCall(selectedFile);
 
       setStatus("transcribing");
@@ -97,9 +123,11 @@ export default function UploadPage() {
 
       setStatus("analyzed");
       setLoadingStepIndex(3);
+      await keepLoadingVisible(startedAt);
       router.push(`/calls/${uploaded.call_id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not analyze audio call.");
+      setTranscriptError("");
       setStatus("failed");
       setAction("idle");
     }
@@ -109,18 +137,22 @@ export default function UploadPage() {
     const validationError = validateTranscriptInput(manualTranscript);
     if (validationError) {
       setError(validationError);
+      setTranscriptError(validationError);
       setMessage("");
       setStatus("failed");
       return;
     }
 
+    const startedAt = Date.now();
     setAction("transcript");
     setError("");
+    setTranscriptError("");
     setMessage("");
-    setStatus("uploaded");
+    setStatus("analyzing");
+    setLoadingStepIndex(0);
 
     try {
-      setLoadingStepIndex(0);
+      await waitForLoadingPaint();
       const createdCall = await createCallFromTranscript({
         title: title.trim() || undefined,
         transcript: manualTranscript.trim(),
@@ -132,9 +164,12 @@ export default function UploadPage() {
 
       setStatus("analyzed");
       setLoadingStepIndex(3);
+      await keepLoadingVisible(startedAt);
       router.push(`/calls/${createdCall.id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not analyze transcript.");
+      const message = err instanceof Error ? err.message : "Could not analyze transcript.";
+      setError(message);
+      setTranscriptError(message);
       setStatus("failed");
       setAction("idle");
     }
@@ -163,16 +198,16 @@ export default function UploadPage() {
   return (
     <section className="section">
       <div className="hero compact-hero">
-        <h1>Analyze Sales Call Audio</h1>
+        <h1>Analyze a Sales Call</h1>
         <p>Upload a sales call recording and SalesMirror will transcribe it, analyze it, and generate a coaching report.</p>
       </div>
 
       <div className="primary-workspace">
         <div className="upload-box">
           <div>
-            <span className="eyebrow">Primary Flow</span>
+            <span className="eyebrow">Audio Flow</span>
             <h2>Upload Audio Call</h2>
-            <p>Use a short sales call file for the local MVP. Real local transcription can take a while on CPU.</p>
+            <p>Use a short sales call file for a fast local demo. Real local transcription can take a while on CPU.</p>
           </div>
 
           <input
@@ -218,7 +253,7 @@ export default function UploadPage() {
         <summary>Already have a transcript?</summary>
         <div className="secondary-tool-body">
           <p>
-            Paste an existing transcript when you want to test analysis quality without running local audio transcription.
+            Paste an existing transcript when you want to generate a coaching report without running audio transcription.
             If your source is video, you can convert it first with{" "}
             <a href="https://github.com/serhataydilek/videototext" rel="noreferrer" target="_blank">
               VideoToText
@@ -243,6 +278,7 @@ export default function UploadPage() {
               onChange={(event) => {
                 setManualTranscript(event.target.value);
                 setError("");
+                setTranscriptError("");
                 setMessage("");
               }}
               placeholder={"Salesperson: Hi, thanks for joining today.\nCustomer: Happy to talk."}
@@ -256,6 +292,7 @@ export default function UploadPage() {
               Analyze Transcript
             </button>
           </div>
+          {transcriptError ? <div className="message error">{transcriptError}</div> : null}
         </div>
       </details>
     </section>

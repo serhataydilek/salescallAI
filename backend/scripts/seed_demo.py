@@ -14,7 +14,7 @@ from app.services.llm.mock_llm import MockLLMService  # noqa: E402
 
 
 SAMPLE_TRANSCRIPT = (
-    Path(__file__).resolve().parents[2] / "sample_mock_transcript.txt"
+    Path(__file__).resolve().parents[2] / "data" / "samples" / "good_sales_call.txt"
 ).read_text(encoding="utf-8")
 
 

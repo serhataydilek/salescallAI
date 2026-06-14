@@ -1,14 +1,28 @@
 # SalesMirror
 
-SalesMirror is a local-first SaaS MVP for uploading a sales call audio file, transcribing it, and generating a sales coaching report.
+SalesMirror is a local-first sales call coaching app. It lets you upload a call recording or paste a transcript, generate a coaching report, review score trends, and export or restore local data.
 
-The first version does not use OpenAI or any paid GPT API. The AI pipeline is provider-based:
+The default setup uses mock AI providers so the app can be demoed without Ollama, faster-whisper, paid APIs, auth, or external services. Optional local AI providers are available when you want real local transcription and analysis:
 
 - Transcription: mock provider by default, optional local `faster-whisper`.
 - Analysis: mock provider by default, optional local Ollama.
-- Providers are isolated behind service classes so they can be swapped later.
+- Providers are isolated behind service classes.
 
 This project intentionally does not include payments, auth, teams, CRM integrations, model training, or fine-tuning.
+
+## Finished Local App
+
+Current show-ready flow:
+
+- Analyze audio uploads or pasted transcripts.
+- Edit transcripts and re-run analysis.
+- View polished coaching reports with scores, mistakes, missed questions, suggested improvements, and example responses.
+- Print reports or save them as PDF from the browser print dialog.
+- Search, filter, sort, delete, and clear local calls.
+- View analytics, score distribution, and score trends.
+- Export calls and analytics locally.
+- Restore calls from JSON backup without restoring uploaded audio binaries.
+- Run backend regression tests with mock providers only.
 
 ## Project Structure
 
@@ -16,14 +30,51 @@ This project intentionally does not include payments, auth, teams, CRM integrati
 salesmirror/
   frontend/   Next.js TypeScript app
   backend/    FastAPI API
-  sample_mock_transcript.txt
+  data/       sample transcripts and evaluation examples
+  docs/       review templates and data strategy notes
   .env.example
 ```
+
+## Quick Demo
+
+Use the mock-provider demo when you want the fastest reliable walkthrough:
+
+1. Start the backend.
+2. Start the frontend.
+3. Seed one analyzed call:
+
+```powershell
+cd salesmirror\backend
+.\.venv\Scripts\python.exe scripts\seed_demo.py
+```
+
+4. Open `http://localhost:3000`.
+5. Walk through the dashboard, latest calls, the call report, transcript editing, report print/download, calls search/filtering, JSON export, and restore preview.
+
+For a live creation demo, open `http://localhost:3000/upload`, expand `Already have a transcript?`, paste `data/samples/good_sales_call.txt`, and click `Analyze Transcript`. This avoids waiting for local audio transcription and does not require Ollama.
+
+## Screenshot Checklist
+
+Capture these screens if you need a README or portfolio image set:
+
+- Dashboard with at least one analyzed call.
+- Upload page showing the audio flow and transcript shortcut.
+- Generated coaching report with score breakdown and recommendations.
+- Calls page with filters, export buttons, and the collapsed Backup and restore section.
+- Backup and restore section after `Preview Restore`.
+
+## Demo Notes
+
+- Mock mode is the recommended show path because it requires no Ollama or faster-whisper.
+- Use synthetic sample transcripts from `data/samples/`; do not demo with private customer calls.
+- Browser print is the supported PDF path.
+- Uploaded audio files are local-only and are not embedded in exports or restored from backups.
+- The Danger Zone clear-all control is intentionally de-emphasized; normal cleanup should use per-call delete.
 
 ## Run Backend
 
 ```powershell
-cd C:\Users\serfu\OneDrive\Desktop\projects\salescall\salesmirror\backend
+cd salesmirror\backend
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
@@ -44,7 +95,7 @@ uvicorn app.main:app --reload --port 8000
 Create a new migration after changing backend SQLAlchemy models:
 
 ```powershell
-cd C:\Users\serfu\OneDrive\Desktop\projects\salescall\salesmirror\backend
+cd salesmirror\backend
 .\.venv\Scripts\alembic.exe revision --autogenerate -m "message"
 ```
 
@@ -53,7 +104,7 @@ Do not commit local database files.
 ## Run Frontend
 
 ```powershell
-cd C:\Users\serfu\OneDrive\Desktop\projects\salescall\salesmirror\frontend
+cd salesmirror\frontend
 npm install
 npm run dev
 ```
@@ -106,30 +157,31 @@ Real local AI mode requires Ollama running with `qwen2.5:7b` pulled and faster-w
 
 1. Start backend and frontend.
 2. Open `http://localhost:3000/upload`.
-3. Upload a short audio file.
-4. Click `Analyze Audio Call`.
-5. SalesMirror uploads the file, transcribes it with the configured transcription provider, analyzes it, and opens the report automatically.
+3. Paste a sample transcript or upload a short audio file.
+4. Click `Analyze Transcript` or `Analyze Audio Call`.
+5. SalesMirror creates the call, analyzes it, and opens the report automatically.
 
 Supported upload extensions are `.mp3`, `.wav`, `.m4a`, and `.webm`. Empty files are rejected.
 
 To seed a demo report without uploading audio:
 
 ```powershell
-cd C:\Users\serfu\OneDrive\Desktop\projects\salescall\salesmirror\backend
+cd salesmirror\backend
 .\.venv\Scripts\Activate.ps1
 python scripts\seed_demo.py
 ```
 
-Then open `http://localhost:3000/calls`.
+Then open `http://localhost:3000/calls` or `http://localhost:3000`.
 
-## Recommended Demo Flow
+## Recommended Live Demo Flow
 
-1. Upload a short sales call audio file.
-2. Click `Analyze Audio Call`.
-3. Wait while SalesMirror uploads, transcribes, analyzes, and opens the report.
-4. Review the generated coaching report.
+1. Start from the dashboard and show totals, score trend, and latest activity.
+2. Open `Calls` and show search, filters, JSON/CSV export, and the secondary Backup and restore section.
+3. Open an analyzed call report and show the score breakdown, coaching notes, transcript editor, print, and text report download.
+4. Open `Upload`, expand `Already have a transcript?`, paste a sample transcript, and generate a fresh report.
+5. Return to the dashboard to show that the new local call is reflected in analytics.
 
-If you already have a transcript, open the secondary `Already have a transcript?` section, paste the text, and click `Analyze Transcript`.
+For a slower audio demo, upload a short `.wav`, `.webm`, `.mp3`, or `.m4a` file and click `Analyze Audio Call`.
 
 If your source is video, convert it to a transcript first with VideoToText when needed:
 `https://github.com/serhataydilek/videototext`
@@ -208,7 +260,7 @@ ollama serve
 Install the optional local transcription dependency:
 
 ```powershell
-cd C:\Users\serfu\OneDrive\Desktop\projects\salescall\salesmirror\backend
+cd salesmirror\backend
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements-local-ai.txt
 ```
@@ -230,7 +282,7 @@ USE_MOCK_LLM=false
 Then restart the backend:
 
 ```powershell
-cd C:\Users\serfu\OneDrive\Desktop\projects\salescall\salesmirror\backend
+cd salesmirror\backend
 .\.venv\Scripts\Activate.ps1
 uvicorn app.main:app --reload --port 8000
 ```
@@ -263,7 +315,7 @@ OLLAMA_MODEL=qwen2.5:7b
 5. Run the backend:
 
 ```powershell
-cd C:\Users\serfu\OneDrive\Desktop\projects\salescall\salesmirror\backend
+cd salesmirror\backend
 .\.venv\Scripts\Activate.ps1
 uvicorn app.main:app --reload --port 8000
 ```
@@ -290,7 +342,7 @@ ollama pull dolphin-llama3:latest
 Run the backend-only comparison script:
 
 ```powershell
-cd C:\Users\serfu\OneDrive\Desktop\projects\salescall\salesmirror\backend
+cd salesmirror\backend
 .\.venv\Scripts\Activate.ps1
 python scripts\compare_ollama_models.py qwen2.5:7b dolphin-llama3:latest
 ```
@@ -325,7 +377,7 @@ OLLAMA_MODEL=qwen2.5:7b
 Install optional local transcription dependencies:
 
 ```powershell
-cd C:\Users\serfu\OneDrive\Desktop\projects\salescall\salesmirror\backend
+cd salesmirror\backend
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements-local-ai.txt
 ```
@@ -352,7 +404,7 @@ The app still defaults to mock providers unless you change `backend/.env`. The s
 Install local AI dependencies:
 
 ```powershell
-cd C:\Users\serfu\OneDrive\Desktop\projects\salescall\salesmirror\backend
+cd salesmirror\backend
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements-local-ai.txt
 ```
@@ -413,7 +465,7 @@ OLLAMA_MODEL=qwen2.5:7b
 Start the backend:
 
 ```powershell
-cd C:\Users\serfu\OneDrive\Desktop\projects\salescall\salesmirror\backend
+cd salesmirror\backend
 .\.venv\Scripts\Activate.ps1
 uvicorn app.main:app --reload --port 8000
 ```
@@ -421,7 +473,7 @@ uvicorn app.main:app --reload --port 8000
 Start the frontend:
 
 ```powershell
-cd C:\Users\serfu\OneDrive\Desktop\projects\salescall\salesmirror\frontend
+cd salesmirror\frontend
 npm run dev
 ```
 
@@ -441,7 +493,7 @@ SalesMirror reports can be shared from the call detail page:
 - Click `Download Report` to save a polished text report with title, created date, source type, status, overall score, score label, score breakdown, coaching notes, and transcript.
 - Click `Print Report` to open browser print. From there, choose `Save as PDF` if you want a PDF copy.
 - Reports use the latest saved transcript and latest analysis. If you edit a transcript, click `Re-run Analysis` before sharing so the report reflects the corrected transcript.
-- Native PDF export is deferred for now to keep the MVP lightweight. The current supported PDF path is browser print/save-as-PDF.
+- PDF sharing uses browser print/save-as-PDF so the app stays lightweight.
 
 ## Finding Calls
 
@@ -495,6 +547,10 @@ Use `Delete Call` from the call list or report page to remove one selected local
 - `GET /calls/{call_id}/report.txt`
 - `DELETE /calls/{call_id}`
 - `DELETE /calls` local/dev clear-all utility
+- `GET /exports/calls.json`
+- `GET /exports/calls.csv`
+- `GET /exports/analytics.json`
+- `POST /imports/calls.json`
 - `GET /health`
 
 ## Provider Architecture
@@ -515,39 +571,16 @@ Rubric:
 
 - `backend/app/services/analysis/rubric.py`
 
-## Data and Model Training Plan
+## Evaluation Notes
 
-This MVP is currently for learning and testing sales call analysis. Do not fine-tune a model yet.
+SalesMirror includes lightweight local assets for reviewing analysis quality without collecting private data:
 
-Phase 1: Prompt + rubric
+- Synthetic sample transcripts live in `data/samples/`.
+- Evaluation examples live in `data/eval/sales_calls_eval.jsonl`.
+- `docs/model_review_template.md` gives a manual review rubric for model comparisons.
+- Generated model comparison results stay local under `backend/eval_results/` and are ignored by git.
 
-- Improve the sales coaching rubric.
-- Test whether Ollama can return valid JSON consistently.
-- Compare model output against expected coaching reports.
-
-Phase 2: Sample transcripts
-
-- Use synthetic transcripts in `data/samples/`.
-- Cover good calls, weak calls, price objections, poor discovery, and strong closing.
-- Keep examples realistic but free of real customer data.
-
-Phase 3: Evaluation dataset
-
-- Use `data/eval/sales_calls_eval.jsonl` to test output quality.
-- Do not train on eval examples.
-- Track whether scores, mistakes, missed questions, and suggested responses match the transcript.
-
-Phase 4: Local Ollama testing
-
-- Run Ollama locally with `USE_MOCK_LLM=false`.
-- Send sample transcripts through the analysis prompt.
-- Check JSON validity, scoring consistency, and usefulness of feedback.
-
-Phase 5: Future LoRA fine-tuning
-
-- Only consider LoRA fine-tuning after the rubric, prompt, and labels are stable.
-- Collect at least 100 to 300 high-quality labeled examples first.
-- Keep fine-tuning local or privacy-safe; do not add paid APIs for this MVP.
+Fine-tuning is intentionally out of scope for this local app. Do not train on evaluation examples.
 
 ## Privacy and Security Notes
 
@@ -555,7 +588,7 @@ Real sales call recordings may contain personal data, confidential business deta
 
 Do not upload real customer calls unless consent, retention policy, deletion policy, and access controls are handled.
 
-For this MVP, uploaded files are stored locally in `backend/storage/uploads/` and are ignored by git. No API keys are hardcoded.
+Uploaded files are stored locally in `backend/storage/uploads/` and are ignored by git. No API keys are hardcoded.
 
 ## Known Limitations
 

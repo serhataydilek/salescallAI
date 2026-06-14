@@ -1,6 +1,6 @@
 # SalesMirror Backend
 
-FastAPI backend for the local-first SalesMirror MVP.
+FastAPI backend for the local-first SalesMirror coaching app.
 
 ## Run Locally
 
@@ -22,7 +22,7 @@ Run migrations before starting the backend against a fresh database:
 .\.venv\Scripts\alembic.exe upgrade head
 ```
 
-SQLite is the default local MVP database. PostgreSQL can be used by setting `DATABASE_URL` before running migrations and starting the app. Do not commit local database files.
+SQLite is the default local database. PostgreSQL can be used by setting `DATABASE_URL` before running migrations and starting the app. Do not commit local database files.
 
 If you already have a pre-Alembic local SQLite database with data, back it up first. Use `alembic stamp head` only when the existing schema already matches the current models.
 
@@ -111,4 +111,4 @@ python scripts\test_local_ai_pipeline.py C:\path\to\audio.webm
 python scripts\seed_demo.py
 ```
 
-This creates one analyzed demo call using `sample_mock_transcript.txt`.
+This creates one analyzed demo call using `data/samples/good_sales_call.txt`.
