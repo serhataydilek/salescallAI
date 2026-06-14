@@ -21,6 +21,12 @@ export type Call = {
   status: CallStatus;
   created_at: string;
   updated_at: string;
+  overall_score: number | null;
+  opening_score: number | null;
+  discovery_score: number | null;
+  objection_handling_score: number | null;
+  closing_score: number | null;
+  follow_up_score: number | null;
 };
 
 export type Transcript = {

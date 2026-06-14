@@ -2,6 +2,20 @@ import Link from "next/link";
 import { DeleteCallButton } from "@/components/DeleteCallButton";
 import type { Call } from "@/lib/api";
 
+const categoryScores = [
+  ["Opening", "opening_score"],
+  ["Discovery", "discovery_score"],
+  ["Objections", "objection_handling_score"],
+  ["Closing", "closing_score"],
+  ["Follow Up", "follow_up_score"],
+] as const;
+
+function scoreLabel(score: number): string {
+  if (score >= 80) return "Strong call";
+  if (score >= 60) return "Decent call";
+  if (score >= 40) return "Weak call";
+  return "Poor call";
+}
 export function CallList({
   calls,
   emptyMessage = "Upload a call or seed demo data to see the coaching report workflow.",
@@ -34,8 +48,30 @@ export function CallList({
               <h3>{call.filename}</h3>
               <div className="meta">Uploaded {new Date(call.created_at).toLocaleString()}</div>
             </div>
-            <span className={`status ${call.status}`}>{call.status}</span>
+            <div className="call-card-badges">
+              <span className={`status ${call.status}`}>{call.status}</span>
+              {call.overall_score !== null ? (
+                <div className={`call-score score-${scoreLabel(call.overall_score).split(" ")[0].toLowerCase()}`}>
+                  <strong>{call.overall_score}</strong>
+                  <span>{scoreLabel(call.overall_score)}</span>
+                </div>
+              ) : (
+                <div className="call-score no-score">
+                  <strong>-</strong>
+                  <span>No score yet</span>
+                </div>
+              )}
+            </div>
           </div>
+          {call.overall_score !== null ? (
+            <div className="call-score-preview" aria-label="Category score preview">
+              {categoryScores.map(([label, key]) => (
+                <span key={key}>
+                  {label} <strong>{call[key] ?? "-"}</strong>
+                </span>
+              ))}
+            </div>
+          ) : null}
           <div className="actions">
             <Link className="button secondary" href={`/calls/${call.id}`}>
               View Report

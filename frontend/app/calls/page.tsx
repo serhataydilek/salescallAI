@@ -48,8 +48,9 @@ function activeFilterLabels(filters: CallFilters): string[] {
   if (filters.q) labels.push(`Search: ${filters.q}`);
   if (filters.status) labels.push(`Status: ${filters.status}`);
   if (filters.source) labels.push(`Source: ${filters.source}`);
-  if (filters.min_score) labels.push(`Min score: ${filters.min_score}`);
-  if (filters.max_score) labels.push(`Max score: ${filters.max_score}`);
+  if (filters.min_score || filters.max_score) {
+    labels.push(`Score: ${filters.min_score || "0"}-${filters.max_score || "100"}`);
+  }
   if (filters.sort && filters.sort !== "newest") {
     labels.push(sortOptions.find((option) => option.value === filters.sort)?.label ?? filters.sort);
   }
@@ -100,9 +101,9 @@ export default async function CallsPage({ searchParams }: CallsPageProps) {
         </div>
       </details>
 
-      <form action="/calls" className="filter-panel">
-        <label className="field">
-          <span>Search</span>
+      <form action="/calls" className="filter-panel calls-filter-panel">
+        <label className="field calls-search-field">
+          <span>Search calls</span>
           <input
             defaultValue={filters.q ?? ""}
             name="q"
@@ -110,48 +111,55 @@ export default async function CallsPage({ searchParams }: CallsPageProps) {
             type="search"
           />
         </label>
-        <label className="field">
-          <span>Status</span>
-          <select defaultValue={filters.status ?? ""} name="status">
-            <option value="">All statuses</option>
-            {statusOptions.map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="field">
-          <span>Source</span>
-          <select defaultValue={filters.source ?? ""} name="source">
-            <option value="">All sources</option>
-            <option value="audio">Audio upload</option>
-            <option value="transcript">Pasted transcript</option>
-          </select>
-        </label>
-        <label className="field">
-          <span>Min score</span>
-          <input defaultValue={filters.min_score ?? ""} max="100" min="0" name="min_score" type="number" />
-        </label>
-        <label className="field">
-          <span>Max score</span>
-          <input defaultValue={filters.max_score ?? ""} max="100" min="0" name="max_score" type="number" />
-        </label>
-        <label className="field">
-          <span>Sort</span>
-          <select defaultValue={filters.sort ?? "newest"} name="sort">
-            {sortOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <div className="filter-actions">
-          <button type="submit">Apply Filters</button>
-          <Link className="button secondary" href="/calls">
-            Reset
-          </Link>
+        <div className="filter-grid">
+          <label className="field">
+            <span>Status</span>
+            <select defaultValue={filters.status ?? ""} name="status">
+              <option value="">All statuses</option>
+              {statusOptions.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="field">
+            <span>Source</span>
+            <select defaultValue={filters.source ?? ""} name="source">
+              <option value="">All sources</option>
+              <option value="audio">Audio upload</option>
+              <option value="transcript">Pasted transcript</option>
+            </select>
+          </label>
+          <fieldset className="score-range-control">
+            <legend>Score range</legend>
+            <div>
+              <label>
+                <span>Min</span>
+                <input defaultValue={filters.min_score ?? ""} max="100" min="0" name="min_score" type="number" />
+              </label>
+              <label>
+                <span>Max</span>
+                <input defaultValue={filters.max_score ?? ""} max="100" min="0" name="max_score" type="number" />
+              </label>
+            </div>
+          </fieldset>
+          <label className="field">
+            <span>Sort by</span>
+            <select defaultValue={filters.sort ?? "newest"} name="sort">
+              {sortOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <div className="filter-actions">
+            <button type="submit">Apply</button>
+            <Link className="button secondary" href="/calls">
+              Reset
+            </Link>
+          </div>
         </div>
         {activeFilters.length > 0 ? (
           <div className="active-filters">

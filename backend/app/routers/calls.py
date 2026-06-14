@@ -14,6 +14,7 @@ from app.schemas import (
     AnalysisBase,
     AnalysisOut,
     CallDetailOut,
+    CallListOut,
     CallOut,
     ClearCallsResponse,
     CreateTranscriptCallRequest,
@@ -244,7 +245,7 @@ def analyze_call(call_id: int, db: Session = Depends(get_db)) -> AnalysisOut:
     return analysis
 
 
-@router.get("", response_model=list[CallOut])
+@router.get("", response_model=list[CallListOut])
 def list_calls(
     q: str | None = None,
     status: str | None = None,
@@ -253,7 +254,7 @@ def list_calls(
     max_score: str | None = None,
     sort: str = "newest",
     db: Session = Depends(get_db),
-) -> list[CallOut]:
+) -> list[CallListOut]:
     parsed_status = status.strip() if status else ""
     parsed_source = source.strip() if source else ""
     parsed_sort = (sort or "newest").strip() or "newest"

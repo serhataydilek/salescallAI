@@ -85,6 +85,30 @@ def test_list_calls_without_filters_preserves_newest_first(client):
     ]
 
 
+def test_list_calls_includes_score_fields_for_analyzed_and_unanalyzed_calls(client):
+    seed_filter_calls()
+
+    response = client.get("/calls")
+    assert response.status_code == 200, response.text
+    calls = {call["filename"]: call for call in response.json()}
+
+    analyzed = calls["Alpha discovery call"]
+    assert analyzed["overall_score"] == 82
+    assert analyzed["opening_score"] == 82
+    assert analyzed["discovery_score"] == 82
+    assert analyzed["objection_handling_score"] == 82
+    assert analyzed["closing_score"] == 82
+    assert analyzed["follow_up_score"] == 82
+
+    unanalyzed = calls["Gamma uploaded audio"]
+    assert unanalyzed["overall_score"] is None
+    assert unanalyzed["opening_score"] is None
+    assert unanalyzed["discovery_score"] is None
+    assert unanalyzed["objection_handling_score"] is None
+    assert unanalyzed["closing_score"] is None
+    assert unanalyzed["follow_up_score"] is None
+
+
 def test_empty_form_filter_values_are_ignored(client):
     seed_filter_calls()
 

@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, computed_field
+from pydantic import BaseModel, ConfigDict, Field, computed_field
 
 from app.services.assistant_coaching import build_assistant_coaching_cards
 
@@ -65,6 +65,40 @@ class CallOut(BaseModel):
     updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class CallListOut(CallOut):
+    analysis: AnalysisOut | None = Field(default=None, exclude=True)
+
+    @computed_field
+    @property
+    def overall_score(self) -> int | None:
+        return self.analysis.overall_score if self.analysis else None
+
+    @computed_field
+    @property
+    def opening_score(self) -> int | None:
+        return self.analysis.opening_score if self.analysis else None
+
+    @computed_field
+    @property
+    def discovery_score(self) -> int | None:
+        return self.analysis.discovery_score if self.analysis else None
+
+    @computed_field
+    @property
+    def objection_handling_score(self) -> int | None:
+        return self.analysis.objection_handling_score if self.analysis else None
+
+    @computed_field
+    @property
+    def closing_score(self) -> int | None:
+        return self.analysis.closing_score if self.analysis else None
+
+    @computed_field
+    @property
+    def follow_up_score(self) -> int | None:
+        return self.analysis.follow_up_score if self.analysis else None
 
 
 class CallDetailOut(CallOut):
