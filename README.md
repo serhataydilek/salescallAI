@@ -427,9 +427,10 @@ Manual test:
 
 SalesMirror reports can be shared from the call detail page:
 
-- Click `Download Report` to save a polished text report with title, date, source, status, scores, coaching notes, and transcript.
+- Click `Download Report` to save a polished text report with title, created date, source type, status, overall score, score label, score breakdown, coaching notes, and transcript.
 - Click `Print Report` to open browser print. From there, choose `Save as PDF` if you want a PDF copy.
-- Native PDF export is a future TODO; the MVP currently uses text export and browser print/save-as-PDF.
+- Reports use the latest saved transcript and latest analysis. If you edit a transcript, click `Re-run Analysis` before sharing so the report reflects the corrected transcript.
+- Native PDF export is deferred for now to keep the MVP lightweight. The current supported PDF path is browser print/save-as-PDF.
 
 ## Deleting Calls
 

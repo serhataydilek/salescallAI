@@ -566,6 +566,15 @@ pre {
   flex-wrap: wrap;
   gap: 10px;
   justify-content: flex-end;
+  max-width: 420px;
+}
+
+.share-helper {
+  color: var(--muted);
+  flex-basis: 100%;
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: right;
 }
 
 .report-score-hero {
@@ -776,6 +785,10 @@ li {
 }
 
 @media print {
+  @page {
+    margin: 0.6in;
+  }
+
   :root {
     --bg: #ffffff;
     --surface: #ffffff;
@@ -787,10 +800,15 @@ li {
 
   body {
     background: #ffffff;
+    color: #111827;
+    font-size: 11pt;
   }
 
   .site-header,
-  .no-print {
+  .no-print,
+  .report-header-actions,
+  .transcript-editor .actions,
+  .transcript-update-message {
     display: none !important;
   }
 
@@ -801,8 +819,28 @@ li {
 
   .section,
   .report-page {
-    gap: 12px;
+    gap: 10px;
     margin-top: 0;
+  }
+
+  h1 {
+    font-size: 24pt;
+    line-height: 1.15;
+    max-width: none;
+  }
+
+  h2 {
+    font-size: 15pt;
+  }
+
+  h3 {
+    font-size: 12pt;
+  }
+
+  p,
+  li {
+    color: #111827;
+    line-height: 1.45;
   }
 
   .report-header,
@@ -812,10 +850,38 @@ li {
     border-color: #d1d5db;
     break-inside: avoid;
     box-shadow: none;
+    padding: 14px;
   }
 
+  .report-header,
+  .report-score-hero,
+  .report-summary,
   .two-column {
     grid-template-columns: 1fr;
+  }
+
+  .report-meta-item,
+  .score,
+  .score-hero-main,
+  .talk-ratio-box {
+    background: #ffffff;
+    border: 1px solid #d1d5db;
+  }
+
+  .overall-score {
+    color: #111827;
+    font-size: 38pt;
+  }
+
+  .score-label,
+  .status {
+    background: #ffffff !important;
+    border: 1px solid #d1d5db;
+    color: #111827 !important;
+  }
+
+  .score strong {
+    font-size: 20pt;
   }
 
   pre,
@@ -823,7 +889,12 @@ li {
     background: #ffffff;
     border: 1px solid #d1d5db;
     color: #111827;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10pt;
+    line-height: 1.45;
     max-height: none;
+    overflow: visible;
+    white-space: pre-wrap;
   }
 
   a {

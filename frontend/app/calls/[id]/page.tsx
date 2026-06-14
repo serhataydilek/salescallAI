@@ -117,6 +117,9 @@ export default async function CallDetailPage({ params }: PageProps) {
           ) : null}
           {transcriptText ? <ReAnalyzeButton callId={call.id} /> : null}
           <DeleteCallButton callId={call.id} redirectTo="/calls" />
+          {analysis ? (
+            <p className="share-helper">Use Print Report and choose Save as PDF to export a PDF.</p>
+          ) : null}
         </div>
       </header>
 
