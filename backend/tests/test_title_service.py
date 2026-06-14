@@ -40,14 +40,20 @@ def test_repeated_character_short_titles_are_generic(title):
 
 
 def test_catastrophic_transcript_does_not_default_to_price_objection():
-    transcript = """Salesperson: This is not worth discussing.
-Customer: I need help with coaching.
-Salesperson: Just check the website later."""
+    transcript = """Salesperson: Yeah hi, is this Dave?
+Customer: It's Sandra.
+Salesperson: I just woke up and forgot the product points.
+Customer: What does it cost?
+Salesperson: I need to get back to you on that. Let me Google the website.
+Customer: I have another meeting in two minutes.
+Salesperson: Can I mark you as a hot lead? My quota resets Friday.
+Customer: Please don't call this number again.
+Salesperson: Do you have any colleagues who might be interested?"""
 
     generated_title = generate_call_title(transcript, "test")
 
     assert generated_title != "Price Objection"
-    assert "Weak Follow-up" in generated_title or "Discovery Gap" in generated_title
+    assert any(term in generated_title for term in ["Brand", "Unprofessional", "Failed", "No Value"])
 
 
 def test_price_or_budget_transcript_generates_price_related_title():
@@ -56,6 +62,20 @@ Customer: The price is too expensive and our budget is tight.
 Salesperson: We can discuss ROI and a pilot next Tuesday."""
 
     assert "Price Objection" in generate_call_title(transcript, "untitled")
+
+
+def test_turkish_catastrophic_transcript_overrides_price_title():
+    transcript = """Satıcı: Kahvemi içmeden aradım ve ürün maddelerini unuttum.
+Müşteri: Ne işe yarıyor?
+Satıcı: Site açılıyor mu diye Google'dan bakmam lazım.
+Müşteri: Fiyatı ne kadar?
+Satıcı: Bilmiyorum, bakmam lazım. Kotam için sizi hot lead yapabilir miyim?
+Müşteri: Bu numarayı tekrar aramayın."""
+
+    generated_title = generate_call_title(transcript, "Price Objection")
+
+    assert generated_title != "Price Objection"
+    assert any(term in generated_title for term in ["Brand", "Unprofessional", "Failed", "No Value"])
 
 
 def test_pilot_or_demo_transcript_generates_pilot_related_title():

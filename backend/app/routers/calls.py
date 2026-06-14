@@ -23,6 +23,7 @@ from app.schemas import (
     UploadResponse,
 )
 from app.services.providers import get_llm_service, get_transcription_service
+from app.services.analysis.calibration import calibrate_analysis
 from app.services.report_service import ReportService
 from app.services.title_service import generate_call_title
 
@@ -219,12 +220,16 @@ def analyze_call(call_id: int, db: Session = Depends(get_db)) -> AnalysisOut:
         raise HTTPException(status_code=400, detail="Transcribe the call before analyzing it.")
 
     try:
-        result = AnalysisBase.model_validate(get_llm_service().analyze_sales_call(call.transcript.text))
+        result = calibrate_analysis(
+            call.transcript.text,
+            AnalysisBase.model_validate(get_llm_service().analyze_sales_call(call.transcript.text)),
+        )
         result_data = result.model_dump()
         analysis = call.analysis or Analysis(call_id=call.id, **result_data)
         for key, value in result_data.items():
             setattr(analysis, key, value)
         call.status = CallStatus.analyzed
+        call.filename = generate_call_title(call.transcript.text, call.filename)
         call.updated_at = datetime.now(timezone.utc)
 
         db.add(analysis)

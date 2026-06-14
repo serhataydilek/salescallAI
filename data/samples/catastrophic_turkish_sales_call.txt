@@ -1,0 +1,13 @@
+Satıcı: Alo, Mehmet Bey mi?
+Müşteri: Hayır, ben Ayşe.
+Satıcı: Pardon Ayşe Hanım. Ben daha yeni uyandım, kahvemi içmeden aradım, biraz da uykusuzum.
+Müşteri: Ne işe yarıyor bu ürün?
+Satıcı: İşletmeler için yazılım gibi bir şey. Açıkçası ürün maddelerini unuttum, site açılıyor mu diye Google'dan bakmam lazım.
+Müşteri: Biz zaten CRM kullanıyoruz.
+Satıcı: Salesforce kötü, ama ben de kullanıyorum ve bazen seviyorum. Bizimki muhtemelen daha iyi.
+Müşteri: Fiyatı ne kadar?
+Satıcı: Bilmiyorum, bakmam lazım. Sonra dönerim.
+Müşteri: İki dakika sonra toplantım var.
+Satıcı: Süper, uzun sürmez. Sizi hot lead olarak işaretleyebilir miyim? Kotam cuma sıfırlanıyor.
+Müşteri: Bu numarayı tekrar aramayın.
+Satıcı: Tamam, peki ilgilenebilecek başka bir arkadaşınız var mı?

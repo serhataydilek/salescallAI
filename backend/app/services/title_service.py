@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from app.services.analysis.calibration import detect_critical_failures
+
 
 GENERIC_TITLES = {
     "asd",
@@ -40,6 +42,14 @@ def is_generic_call_title(title: str | None) -> bool:
 
 
 def generate_call_title(transcript: str, current_title: str | None = None) -> str:
+    critical_signals = detect_critical_failures(transcript)
+    if critical_signals.is_catastrophic:
+        if critical_signals.unprepared or critical_signals.quota_pressure or critical_signals.do_not_contact:
+            return "Brand-Damaging Sales Call"
+        if critical_signals.product_uncertainty:
+            return "Failed CRM Pitch with No Value Proposition"
+        return "Unprofessional Cold Call and Failed Discovery"
+
     if current_title and not is_generic_call_title(current_title):
         return current_title[:255]
 
