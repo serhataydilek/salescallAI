@@ -11,13 +11,30 @@ load_dotenv(ROOT / ".env")
 from app.schemas import AnalysisBase  # noqa: E402
 from app.services.analysis.calibration import calibrate_analysis  # noqa: E402
 from app.services.providers import env_flag, get_llm_service  # noqa: E402
+from app.services.title_service import generate_call_title  # noqa: E402
 
 
 SAMPLES = [
-    ("good", PROJECT_ROOT / "data" / "samples" / "good_sales_call.txt", 75, 100),
-    ("medium", PROJECT_ROOT / "data" / "samples" / "medium_sales_call.txt", 45, 75),
-    ("catastrophic", PROJECT_ROOT / "data" / "samples" / "catastrophic_sales_call.txt", 0, 25),
-    ("catastrophic_turkish", PROJECT_ROOT / "data" / "samples" / "catastrophic_turkish_sales_call.txt", 0, 25),
+    (
+        "strong",
+        PROJECT_ROOT / "data" / "samples" / "strong_sales_call.txt",
+        {"overall": (85, 94), "opening": (80, 95), "discovery": (80, 95), "objection": (75, 90), "closing": (80, 95), "follow_up": (80, 95)},
+    ),
+    (
+        "feature_dump",
+        PROJECT_ROOT / "data" / "samples" / "feature_dump_sales_call.txt",
+        {"overall": (40, 55), "discovery": (0, 55), "closing": (0, 50), "follow_up": (0, 50)},
+    ),
+    (
+        "weak_price_objection",
+        PROJECT_ROOT / "data" / "samples" / "weak_price_objection_sales_call.txt",
+        {"overall": (58, 70), "discovery": (65, 85), "objection": (25, 50), "closing": (35, 55), "follow_up": (35, 55)},
+    ),
+    (
+        "catastrophic",
+        PROJECT_ROOT / "data" / "samples" / "catastrophic_sales_call.txt",
+        {"overall": (0, 25), "opening": (0, 10), "discovery": (0, 15), "objection": (0, 10), "closing": (0, 5), "follow_up": (0, 5)},
+    ),
 ]
 
 
@@ -26,30 +43,30 @@ def main() -> int:
     using_mock = env_flag("USE_MOCK_LLM", True)
     failures: list[str] = []
 
-    for label, path, minimum, maximum in SAMPLES:
+    for label, path, ranges in SAMPLES:
         transcript = path.read_text(encoding="utf-8")
         analysis = calibrate_analysis(transcript, AnalysisBase.model_validate(service.analyze_sales_call(transcript)))
-        score = analysis.overall_score
-        print(
-            f"{label}: overall={score}, opening={analysis.opening_score}, discovery={analysis.discovery_score}, "
-            f"objection={analysis.objection_handling_score}, closing={analysis.closing_score}, follow_up={analysis.follow_up_score}"
-        )
+        title = generate_call_title(transcript, "manual transcript")
+        scores = {
+            "overall": analysis.overall_score,
+            "opening": analysis.opening_score,
+            "discovery": analysis.discovery_score,
+            "objection": analysis.objection_handling_score,
+            "closing": analysis.closing_score,
+            "follow_up": analysis.follow_up_score,
+        }
+        status = "PASS"
+        for score_name, (minimum, maximum) in ranges.items():
+            if not minimum <= scores[score_name] <= maximum:
+                status = "FAIL"
+                failures.append(f"{label} {score_name} score {scores[score_name]} outside {minimum}-{maximum}")
 
-        if score < minimum or score > maximum:
-            failures.append(f"{label} score {score} outside expected range {minimum}-{maximum}")
-        if label.startswith("catastrophic"):
-            category_failures = [
-                ("opening", analysis.opening_score, 10),
-                ("discovery", analysis.discovery_score, 15),
-                ("objection", analysis.objection_handling_score, 10),
-                ("closing", analysis.closing_score, 5),
-                ("follow_up", analysis.follow_up_score, 5),
-            ]
-            for category, value, maximum_category_score in category_failures:
-                if value > maximum_category_score:
-                    failures.append(
-                        f"catastrophic {category} score {value} above {maximum_category_score}"
-                    )
+        print(
+            f"{status}: {label}: title={title!r}, overall={analysis.overall_score}, "
+            f"opening={analysis.opening_score}, discovery={analysis.discovery_score}, "
+            f"objection={analysis.objection_handling_score}, closing={analysis.closing_score}, "
+            f"follow_up={analysis.follow_up_score}"
+        )
 
     if failures:
         for failure in failures:

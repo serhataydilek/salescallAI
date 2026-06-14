@@ -56,12 +56,22 @@ Salesperson: Do you have any colleagues who might be interested?"""
     assert any(term in generated_title for term in ["Brand", "Unprofessional", "Failed", "No Value"])
 
 
-def test_price_or_budget_transcript_generates_price_related_title():
+def test_weak_price_or_budget_transcript_generates_price_related_title():
     transcript = """Salesperson: Thanks for joining today.
 Customer: The price is too expensive and our budget is tight.
-Salesperson: We can discuss ROI and a pilot next Tuesday."""
+Salesperson: I am not sure, but it should be reasonable. I can send info and we can talk later."""
 
     assert "Price Objection" in generate_call_title(transcript, "untitled")
+
+
+def test_price_handled_with_value_and_pilot_does_not_default_to_price_objection():
+    transcript = """Salesperson: Thanks for joining today. What coaching metric matters most?
+Customer: The price is too expensive and our budget is tight.
+Salesperson: We can prove value with a low-risk pilot and review ROI next Tuesday."""
+
+    generated_title = generate_call_title(transcript, "Price Objection")
+
+    assert generated_title != "Price Objection"
 
 
 def test_turkish_catastrophic_transcript_overrides_price_title():

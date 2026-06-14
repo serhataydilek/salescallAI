@@ -1,15 +1,37 @@
-Salesperson: Yeah hi, is this Dave? Derek? Something with a D?
-Customer: It's Sandra.
-Salesperson: Right, Sandra. Cool. I just woke up like twenty minutes ago and I have not had coffee yet, so bear with me.
-Customer: What is this regarding?
-Salesperson: Software. It does a lot of stuff. Honestly our marketing team wrote the bullet points and I keep forgetting them.
-Customer: What kind of software? We already use a CRM.
-Salesperson: Ours is like a CRM but better. Probably. What CRM do you use?
+Salesperson: Selam, ÅŸey... bu Murat mÄ±ydÄ±? Yoksa Mert miydi?
+
+Customer: Ben Elif.
+
+Salesperson: Hah tamam Elif HanÄ±m. Kusura bakmayÄ±n, liste biraz karÄ±ÅŸÄ±k. Ben de aÃ§Ä±kÃ§asÄ± biraz uykusuzum, kahvemi iÃ§meden aramaya baÅŸladÄ±m.
+
+Customer: Peki, konu neydi?
+
+Salesperson: YazÄ±lÄ±m. BÃ¶yle ÅŸirketler iÃ§in bir ÅŸey. Ã‡ok Ã¶zelliÄŸi var. Dashboard var, AI var, rapor var. Bizim ekip bayaÄŸÄ± iyi olduÄŸunu sÃ¶ylÃ¼yor.
+
+Customer: Ne iÅŸe yarÄ±yor tam olarak?
+
+Salesperson: Genel olarak iÅŸleri kolaylaÅŸtÄ±rÄ±yor. SatÄ±ÅŸ tarafÄ±nda falan kullanÄ±lÄ±yor. AslÄ±nda detaylarÄ± web sitesinde daha iyi yazÄ±yor ama site dÃ¼n Ã§alÄ±ÅŸmÄ±yordu galiba.
+
+Customer: Biz zaten CRM kullanÄ±yoruz.
+
+Salesperson: Hangi CRM?
+
 Customer: Salesforce.
-Salesperson: Oof. Salesforce is terrible. I actually use it myself and kind of like it, but ours is way better.
-Customer: What does it cost?
-Salesperson: Great question. I need to get back to you on that. Or you could go to our website. Actually, let me Google it real quick.
-Customer: I have another meeting in two minutes.
-Salesperson: Perfect, this will not take long. Can I put you down as a hot lead? My quota resets Friday and things are not looking great.
-Customer: Please don't call this number again.
-Salesperson: Totally fair. One last thing, do you have any colleagues who might be interested?
+
+Salesperson: Oof, Salesforce kÃ¶tÃ¼ ya. GerÃ§i ben de bazen kullanÄ±yorum ve fena deÄŸil ama yani bizimki daha iyi olabilir. Muhtemelen daha ucuzdur da, bakmam lazÄ±m.
+
+Customer: FiyatÄ± bilmiyor musunuz?
+
+Salesperson: Åžu an net sÃ¶yleyemem. Web sitesinde vardÄ±r bÃ¼yÃ¼k ihtimalle. Bir saniye ben Google'dan bakayÄ±m... Site aÃ§Ä±lÄ±yor mu acaba...
+
+Customer: Benim iki dakika sonra toplantÄ±m var.
+
+Salesperson: SÃ¼per, kÄ±sa tutarÄ±m. Sizi hot lead olarak iÅŸaretleyebilir miyim? Kota haftaya kapanÄ±yor ve durumlar Ã§ok iyi deÄŸil aÃ§Ä±kÃ§asÄ±.
+
+Customer: HayÄ±r, lÃ¼tfen bu numarayÄ± tekrar aramayÄ±n.
+
+Salesperson: Tamam, anladÄ±m. Son bir ÅŸey, ilgilenebilecek baÅŸka biri var mÄ±? Ã–zellikle satÄ±ÅŸ ekibinden biri olabilir.
+
+Customer: HayÄ±r. Ä°yi gÃ¼nler.
+
+Salesperson: TamamdÄ±r, gÃ¶rÃ¼ÅŸÃ¼rÃ¼z.

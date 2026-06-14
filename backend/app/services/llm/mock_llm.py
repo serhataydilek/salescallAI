@@ -1,5 +1,6 @@
 from typing import Any
 
+from app.services.analysis.calibration import detect_sales_quality_signals
 from app.services.llm.base import LLMService
 
 
@@ -177,6 +178,7 @@ TURKISH_MARKERS = [
 class MockLLMService(LLMService):
     def analyze_sales_call(self, transcript: str) -> dict[str, Any]:
         lower_text = transcript.lower()
+        quality_signals = detect_sales_quality_signals(transcript)
         is_turkish = any(marker in lower_text for marker in TURKISH_MARKERS)
         salesperson_lines = [
             line
@@ -186,12 +188,14 @@ class MockLLMService(LLMService):
         question_count = sum(line.count("?") for line in salesperson_lines)
 
         has_opening = any(term in lower_text for term in GREETING_TERMS)
-        has_discovery = question_count >= 2 and any(term in lower_text for term in DISCOVERY_TERMS)
+        has_discovery = quality_signals.strong_discovery or (
+            question_count >= 2 and any(term in lower_text for term in DISCOVERY_TERMS)
+        )
         has_price_objection = any(term in lower_text for term in PRICE_TERMS)
-        has_value_response = any(term in lower_text for term in VALUE_TERMS)
-        has_next_step = any(term in lower_text for term in CONCRETE_NEXT_STEP_TERMS)
-        has_success_criteria = any(term in lower_text for term in SUCCESS_TERMS)
-        has_vague_response = any(term in lower_text for term in VAGUE_RESPONSE_TERMS)
+        has_value_response = quality_signals.value_pilot_framing or any(term in lower_text for term in VALUE_TERMS)
+        has_next_step = quality_signals.concrete_next_step or any(term in lower_text for term in CONCRETE_NEXT_STEP_TERMS)
+        has_success_criteria = quality_signals.success_metric_question or any(term in lower_text for term in SUCCESS_TERMS)
+        has_vague_response = quality_signals.vague_roi_or_pricing or any(term in lower_text for term in VAGUE_RESPONSE_TERMS)
         critical_flags = {
             "do_not_contact": any(term in lower_text for term in DO_NOT_CONTACT_TERMS),
             "unprepared": any(term in lower_text for term in UNPREPARED_TERMS),
@@ -222,6 +226,8 @@ class MockLLMService(LLMService):
             and has_value_response
             and has_next_step
             and has_success_criteria
+            and not quality_signals.weak_price_response
+            and not quality_signals.feature_dumping
             and not has_vague_response
             and not any(critical_flags.values())
         )
@@ -232,7 +238,15 @@ class MockLLMService(LLMService):
             closing_score = max(closing_score, 86)
             follow_up_score = max(follow_up_score, 88)
 
-        if has_vague_response:
+        if quality_signals.is_feature_dump:
+            discovery_score = min(discovery_score, 52)
+            closing_score = min(closing_score, 48)
+            follow_up_score = min(follow_up_score, 45)
+        elif quality_signals.is_weak_price_objection:
+            objection_score = min(objection_score, 46)
+            closing_score = min(closing_score, 52)
+            follow_up_score = min(follow_up_score, 52)
+        elif has_vague_response:
             discovery_score = min(discovery_score, 50)
             closing_score = min(closing_score, 48)
             follow_up_score = min(follow_up_score, 45)

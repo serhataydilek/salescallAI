@@ -1,0 +1,33 @@
+Salesperson: Merhaba Emre Bey, Ã¶nce mevcut satÄ±ÅŸ ekibinizde gÃ¶rÃ¼ÅŸme deÄŸerlendirme sÃ¼recini anlamak isterim. Åžu anda Ã§aÄŸrÄ±larÄ± nasÄ±l inceliyorsunuz?
+
+Customer: Ekip liderleri bazÄ± Ã§aÄŸrÄ±larÄ± dinliyor ama Ã§ok sistematik deÄŸil.
+
+Salesperson: En bÃ¼yÃ¼k zorluk zaman mÄ±, yoksa temsilcilerin hangi konuda eksik kaldÄ±ÄŸÄ±nÄ± net gÃ¶rmek mi?
+
+Customer: Ä°kisi de var. Ã–zellikle yeni baÅŸlayanlar Ã¼rÃ¼nÃ¼ anlatÄ±yor ama mÃ¼ÅŸterinin problemini tam aÃ§mÄ±yor.
+
+Salesperson: Yani discovery kalitesi sizin iÃ§in Ã¶nemli. Peki bu eksikliÄŸi bugÃ¼n nasÄ±l takip ediyorsunuz?
+
+Customer: Genelde yÃ¶neticinin yorumuna kalÄ±yor. Net bir skor veya standart yok.
+
+Salesperson: SalesMirror burada her Ã§aÄŸrÄ±yÄ± analiz edip discovery, objection handling, closing gibi alanlarda skor veriyor. AyrÄ±ca satÄ±ÅŸÃ§Ä±ya kaÃ§Ä±rdÄ±ÄŸÄ± sorularÄ± ve daha iyi cevap Ã¶rneklerini gÃ¶steriyor.
+
+Customer: GÃ¼zel. Ama fiyatÄ± yÃ¼ksekse bizim iÃ§in zor olur. Zaten birkaÃ§ farklÄ± araÃ§ kullanÄ±yoruz.
+
+Salesperson: AslÄ±nda fiyat konusunda Ã§ok endiÅŸelenmenize gerek yok. Piyasadaki araÃ§lara gÃ¶re uygun olur diye dÃ¼ÅŸÃ¼nÃ¼yorum.
+
+Customer: Uygun derken ne kadar?
+
+Salesperson: Net sÃ¶ylemem zor ama Ã§ok pahalÄ± olmaz. Zaten yapay zeka olduÄŸu iÃ§in iÅŸinizi kolaylaÅŸtÄ±rÄ±r.
+
+Customer: Bu cevap biraz genel oldu. Biz yatÄ±rÄ±mÄ±n karÅŸÄ±lÄ±ÄŸÄ±nÄ± gÃ¶rmek isteriz.
+
+Salesperson: HaklÄ±sÄ±nÄ±z. O zaman Ã¶nce bir demo yaparÄ±z. BeÄŸenirseniz devam ederiz.
+
+Customer: Demo sonrasÄ± neye gÃ¶re karar vereceÄŸiz?
+
+Salesperson: RaporlarÄ± beÄŸenip beÄŸenmediÄŸinize gÃ¶re karar veririz.
+
+Customer: Tamam, Ã¶rnek gÃ¶nderin.
+
+Salesperson: Tamam, bugÃ¼n yollarÄ±m. Sonra uygun olunca konuÅŸuruz.

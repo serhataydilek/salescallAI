@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from app.services.analysis.calibration import detect_critical_failures
+from app.services.analysis.calibration import detect_critical_failures, detect_sales_quality_signals
 
 
 GENERIC_TITLES = {
@@ -18,6 +18,22 @@ GENERIC_TITLES = {
     "untitled",
     "upload",
     "voice",
+}
+GENERATED_TITLES = {
+    "brand-damaging sales call",
+    "discovery gap in sales call",
+    "failed crm pitch with no value proposition",
+    "feature-led sales pitch with weak discovery",
+    "generic sales coaching pitch",
+    "price objection",
+    "price objection and sales coaching pilot discussion",
+    "sales call analysis",
+    "sales coaching pilot discussion",
+    "sales coaching pilot with clear next step",
+    "strong sales coaching pilot discovery",
+    "unprofessional cold call and failed discovery",
+    "weak follow-up",
+    "weak price objection handling",
 }
 
 
@@ -50,23 +66,32 @@ def generate_call_title(transcript: str, current_title: str | None = None) -> st
             return "Failed CRM Pitch with No Value Proposition"
         return "Unprofessional Cold Call and Failed Discovery"
 
-    if current_title and not is_generic_call_title(current_title):
+    if current_title and not is_generic_call_title(current_title) and not _is_generated_title(current_title):
         return current_title[:255]
 
     lower_text = transcript.lower()
-    title_parts: list[str] = []
+    quality_signals = detect_sales_quality_signals(transcript)
+    if quality_signals.is_strong_call:
+        return "Sales Coaching Pilot with Clear Next Step"
+    if quality_signals.is_feature_dump:
+        return "Feature-Led Sales Pitch with Weak Discovery"
+    if quality_signals.is_weak_price_objection:
+        return "Weak Price Objection Handling"
 
-    if _contains_any(lower_text, ["price", "cost", "expensive", "budget", "fiyat", "pahali", "pahalı"]):
+    title_parts: list[str] = []
+    has_price_mention = _contains_any(
+        lower_text,
+        ["price", "cost", "expensive", "budget", "fiyat", "pahali", "pahal"],
+    )
+    has_good_value_framing = quality_signals.value_pilot_framing and quality_signals.concrete_next_step
+    if has_price_mention and not has_good_value_framing:
         title_parts.append("Price Objection")
     if _contains_any(lower_text, ["pilot", "trial", "demo", "deneme"]):
         title_parts.append("Sales Coaching Pilot Discussion")
-    if _contains_any(
-        lower_text,
-        ["onboarding", "training", "new reps", "new hires", "yeni", "eğitim", "egitim", "oryantasyon"],
-    ):
+    if _contains_any(lower_text, ["onboarding", "training", "new reps", "new hires", "yeni", "egitim"]):
         title_parts.append("New Rep Training Workflow Call")
 
-    has_next_step = _contains_any(
+    has_next_step = quality_signals.concrete_next_step or _contains_any(
         lower_text,
         [
             "next step",
@@ -82,12 +107,9 @@ def generate_call_title(transcript: str, current_title: str | None = None) -> st
             "wednesday",
             "thursday",
             "friday",
-            "sonraki adım",
-            "sonraki adim",
+            "sonraki",
             "takip",
-            "toplantı",
-            "toplanti",
-            "görüşelim",
+            "toplant",
             "goruselim",
         ],
     )
@@ -97,12 +119,9 @@ def generate_call_title(transcript: str, current_title: str | None = None) -> st
             "you can check the website later",
             "you can get back to me",
             "get back to me",
-            "siz donersiniz",
-            "siz dönersiniz",
-            "sonra bakariz",
-            "sonra bakarız",
-            "web sitesine bakarsınız",
-            "web sitesine bakarsiniz",
+            "sonra bak",
+            "sonra konu",
+            "web sitesine bak",
         ],
     )
     if not has_next_step or vague_follow_up:
@@ -123,3 +142,7 @@ def generate_call_title(transcript: str, current_title: str | None = None) -> st
 
 def _contains_any(text: str, terms: list[str]) -> bool:
     return any(term in text for term in terms)
+
+
+def _is_generated_title(title: str) -> bool:
+    return title.lower().strip() in GENERATED_TITLES

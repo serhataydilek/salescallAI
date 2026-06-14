@@ -1,0 +1,33 @@
+Salesperson: Merhaba Zeynep HanÄ±m, SalesMirror satÄ±ÅŸ gÃ¶rÃ¼ÅŸmelerini analiz eden bir yapay zeka aracÄ±dÄ±r. Size kÄ±saca Ã¶zelliklerinden bahsedeyim.
+
+Customer: Tamam, dinliyorum.
+
+Salesperson: Sistem Ã§aÄŸrÄ±larÄ± yazÄ±ya Ã§eviriyor, sonra opening, discovery, objection handling, closing ve follow-up gibi alanlarda skor veriyor. AyrÄ±ca dashboard var, trend analizi var, export var, restore var.
+
+Customer: Peki bizim ÅŸirkette ne iÅŸe yarar?
+
+Salesperson: Genel olarak satÄ±ÅŸ ekipleri iÃ§in faydalÄ±. Her Ã§aÄŸrÄ±yÄ± analiz edebiliyorsunuz. BÃ¶ylece kimin iyi, kimin kÃ¶tÃ¼ olduÄŸunu gÃ¶rÃ¼yorsunuz.
+
+Customer: Bizim en bÃ¼yÃ¼k problemimiz yeni temsilcilerin mÃ¼ÅŸteriye doÄŸru soru soramamasÄ±.
+
+Salesperson: Evet, sistem zaten soru kaÃ§Ä±rdÄ±ysa onu gÃ¶steriyor. Mesela missed questions diye bir bÃ¶lÃ¼m var. Orada sorulmasÄ± gereken sorularÄ± yazÄ±yor.
+
+Customer: Bunun bizim mevcut sÃ¼rece nasÄ±l baÄŸlanacaÄŸÄ±nÄ± anlamadÄ±m.
+
+Salesperson: AslÄ±nda Ã§ok basit. Ã‡aÄŸrÄ±yÄ± yÃ¼klÃ¼yorsunuz, sistem rapor Ã§Ä±karÄ±yor. Sonra ekip lideri rapora bakÄ±yor.
+
+Customer: Peki bunu denemek iÃ§in ne yapmamÄ±z gerekir?
+
+Salesperson: BirkaÃ§ gÃ¶rÃ¼ÅŸme gÃ¶nderebilirsiniz. Biz analiz ederiz.
+
+Customer: BaÅŸarÄ±yÄ± nasÄ±l Ã¶lÃ§eceÄŸiz?
+
+Salesperson: Skorlara bakarÄ±z. Skorlar yÃ¼ksekse iyi, dÃ¼ÅŸÃ¼kse geliÅŸtirmek gerekir.
+
+Customer: Fiyat?
+
+Salesperson: KullanÄ±ma gÃ¶re deÄŸiÅŸir. Ã‡ok yÃ¼ksek olmaz diye dÃ¼ÅŸÃ¼nÃ¼yorum.
+
+Customer: Tamam, bilgi gÃ¶nderin.
+
+Salesperson: Tamam, size mail atarÄ±m. Sonra konuÅŸuruz.

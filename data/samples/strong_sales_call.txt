@@ -1,0 +1,33 @@
+Salesperson: Merhaba Burak Bey, gÃ¶rÃ¼ÅŸmeye baÅŸlamadan Ã¶nce size Ã¼rÃ¼n anlatmak yerine mevcut satÄ±ÅŸ koÃ§luÄŸu sÃ¼recinizi anlamak istiyorum. Åžu anda satÄ±ÅŸ temsilcilerinin gÃ¶rÃ¼ÅŸmelerini nasÄ±l deÄŸerlendiriyorsunuz?
+
+Customer: Genelde ekip liderleri haftada birkaÃ§ gÃ¶rÃ¼ÅŸme dinliyor. Ama tÃ¼m gÃ¶rÃ¼ÅŸmeleri analiz edemiyoruz.
+
+Salesperson: Haftada birkaÃ§ gÃ¶rÃ¼ÅŸme dinlemek size genel fikir veriyor ama temsilci bazÄ±nda dÃ¼zenli geliÅŸim takibi zor oluyor gibi. DoÄŸru mu anladÄ±m?
+
+Customer: Evet, Ã¶zellikle yeni baÅŸlayanlarda aynÄ± hatalar tekrar ediyor.
+
+Salesperson: Bu hatalar daha Ã§ok mÃ¼ÅŸteri ihtiyacÄ±nÄ± anlama tarafÄ±nda mÄ±, fiyat itirazlarÄ±nda mÄ±, yoksa gÃ¶rÃ¼ÅŸme sonunda net aksiyon alma kÄ±smÄ±nda mÄ± oluyor?
+
+Customer: En Ã§ok ihtiyaÃ§ anlama ve kapanÄ±ÅŸta. Temsilciler bazen Ã¼rÃ¼nÃ¼ hÄ±zlÄ± anlatÄ±yor ama mÃ¼ÅŸterinin gerÃ§ek problemini aÃ§mÄ±yor.
+
+Salesperson: AnladÄ±m. Yani sizin iÃ§in mesele sadece Ã§aÄŸrÄ±larÄ± dinlemek deÄŸil, her temsilciye tekrar eden hatalarÄ±nÄ± gÃ¶sterebilmek. Peki bunu Ã¶lÃ§mek iÃ§in hangi metrik sizin iÃ§in anlamlÄ± olur? Ramp sÃ¼resi, dÃ¶nÃ¼ÅŸÃ¼m oranÄ±, demo sonrasÄ± takip oranÄ± gibi?
+
+Customer: Ramp sÃ¼resi ve demo sonrasÄ± takip bizim iÃ§in Ã¶nemli.
+
+Salesperson: SalesMirror burada Ã§aÄŸrÄ±larÄ± transcript Ã¼zerinden analiz edip opening, discovery, objection handling, closing ve follow-up skorlarÄ± Ã§Ä±karÄ±yor. Daha Ã¶nemlisi, temsilciye "burada ÅŸu soruyu sormalÄ±ydÄ±n" gibi direkt koÃ§luk notu veriyor.
+
+Customer: GÃ¼zel. Ama bizim iÃ§in ekstra iÅŸ Ã§Ä±karmamasÄ± lazÄ±m.
+
+Salesperson: HaklÄ±sÄ±nÄ±z. Ä°lk pilotu minimum iÅŸ yÃ¼kÃ¼yle kurabiliriz. Sizden sadece 10 Ã¶rnek gÃ¶rÃ¼ÅŸme alÄ±rÄ±z. Biz analiz ederiz, sonra raporlarda iki ÅŸeye bakarÄ±z: discovery eksikleri tekrar ediyor mu ve follow-up kalitesi artÄ±yor mu.
+
+Customer: Peki fiyat nasÄ±l olacak?
+
+Salesperson: Pilot iÃ§in dÃ¼ÅŸÃ¼k riskli ilerleyelim. Ã–nce 10 Ã§aÄŸrÄ± Ã¼zerinden deÄŸeri kanÄ±tlayalÄ±m. EÄŸer temsilcilerin eksiklerini net gÃ¶sterirse, aylÄ±k kullanÄ±m modelini konuÅŸuruz. Yani fiyatÄ± karar kriteri yapmadan Ã¶nce deÄŸeri Ã¶lÃ§mÃ¼ÅŸ oluruz.
+
+Customer: MantÄ±klÄ±. Bir Ã¶rnek rapor gÃ¶rmek isterim.
+
+Salesperson: BugÃ¼n size Ã¶rnek raporu gÃ¶ndereyim. PerÅŸembe gÃ¼nÃ¼ 15:00'te 20 dakikalÄ±k bir gÃ¶rÃ¼ÅŸmeyle pilot Ã§aÄŸrÄ± sayÄ±sÄ±nÄ±, baÅŸarÄ± metriklerini ve karar sÃ¼recini netleÅŸtirelim. Size uygun mu?
+
+Customer: Uygun.
+
+Salesperson: Harika. BugÃ¼n Ã¶rnek rapor, perÅŸembe 15:00 pilot planÄ±. GÃ¶rÃ¼ÅŸme sonrasÄ± size kÄ±sa bir Ã¶zet maili de gÃ¶ndereceÄŸim.
