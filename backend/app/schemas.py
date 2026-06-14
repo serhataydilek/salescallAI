@@ -76,3 +76,39 @@ class DeleteCallResponse(BaseModel):
     deleted_call_id: int
     deleted_file: bool
     message: str
+
+
+class ScoreDistributionOut(BaseModel):
+    strong: int
+    decent: int
+    weak: int
+    poor: int
+
+
+class RecentCallSummaryOut(BaseModel):
+    id: int
+    title: str
+    status: Literal["uploaded", "transcribed", "analyzed", "failed"]
+    source: Literal["audio", "transcript"]
+    overall_score: int | None
+    created_at: datetime
+
+
+class AnalyticsSummaryOut(BaseModel):
+    total_calls: int
+    analyzed_calls: int
+    transcribed_calls: int
+    uploaded_calls: int
+    failed_calls: int
+    transcript_calls: int
+    audio_calls: int
+    average_overall_score: float | None
+    average_opening_score: float | None
+    average_discovery_score: float | None
+    average_objection_handling_score: float | None
+    average_closing_score: float | None
+    average_follow_up_score: float | None
+    weakest_category: str | None
+    strongest_category: str | None
+    score_distribution: ScoreDistributionOut
+    recent_calls: list[RecentCallSummaryOut]

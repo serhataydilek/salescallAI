@@ -149,6 +149,16 @@ button:disabled {
   gap: 14px;
 }
 
+.dashboard-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+
+.dashboard-two-column {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .call-card,
 .panel {
   background: var(--surface);
@@ -207,6 +217,98 @@ button:disabled {
 .meta {
   color: var(--muted);
   font-size: 14px;
+}
+
+.metric-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+}
+
+.metric-card span,
+.metric-card small {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.metric-card strong {
+  color: var(--text);
+  font-size: 26px;
+  line-height: 1.1;
+}
+
+.analytics-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.distribution-row {
+  display: grid;
+  gap: 8px;
+}
+
+.distribution-label {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.distribution-label span {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.distribution-track {
+  background: var(--surface-muted);
+  border-radius: 999px;
+  height: 10px;
+  overflow: hidden;
+}
+
+.distribution-fill {
+  background: var(--primary);
+  border-radius: 999px;
+  height: 100%;
+}
+
+.source-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.recent-list {
+  display: grid;
+  gap: 10px;
+}
+
+.recent-row {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 14px;
+}
+
+.recent-row div {
+  display: grid;
+  gap: 4px;
+}
+
+.recent-row span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.recent-row-meta {
+  justify-items: end;
 }
 
 .upload-box {
@@ -809,6 +911,20 @@ li {
 
   .two-column {
     grid-template-columns: 1fr;
+  }
+
+  .dashboard-two-column,
+  .source-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .recent-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .recent-row-meta {
+    justify-items: start;
   }
 
   .filter-panel {

@@ -53,6 +53,40 @@ export type CallDetail = Call & {
   analysis: Analysis | null;
 };
 
+export type AnalyticsRecentCall = {
+  id: number;
+  title: string;
+  status: CallStatus;
+  source: CallSource;
+  overall_score: number | null;
+  created_at: string;
+};
+
+export type AnalyticsSummary = {
+  total_calls: number;
+  analyzed_calls: number;
+  transcribed_calls: number;
+  uploaded_calls: number;
+  failed_calls: number;
+  transcript_calls: number;
+  audio_calls: number;
+  average_overall_score: number | null;
+  average_opening_score: number | null;
+  average_discovery_score: number | null;
+  average_objection_handling_score: number | null;
+  average_closing_score: number | null;
+  average_follow_up_score: number | null;
+  weakest_category: string | null;
+  strongest_category: string | null;
+  score_distribution: {
+    strong: number;
+    decent: number;
+    weak: number;
+    poor: number;
+  };
+  recent_calls: AnalyticsRecentCall[];
+};
+
 export class ApiError extends Error {
   status: number;
 
@@ -129,6 +163,10 @@ export function getCalls(filters: CallFilters = {}): Promise<Call[]> {
 
 export function getCall(id: string): Promise<CallDetail> {
   return request<CallDetail>(`/calls/${id}`);
+}
+
+export function getAnalyticsSummary(): Promise<AnalyticsSummary> {
+  return request<AnalyticsSummary>("/analytics/summary");
 }
 
 export function clearCalls(): Promise<{ deleted_count: number; deleted_files: number }> {

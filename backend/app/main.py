@@ -9,6 +9,7 @@ BACKEND_DIR = Path(__file__).resolve().parents[1]
 load_dotenv(BACKEND_DIR / ".env")
 
 from app.database import Base, engine
+from app.routers.analytics import router as analytics_router
 from app.routers.calls import router as calls_router
 
 if os.getenv("SALESMIRROR_AUTO_CREATE_TABLES", "").strip().lower() in {"1", "true", "yes", "on"}:
@@ -26,6 +27,7 @@ app.add_middleware(
 )
 
 app.include_router(calls_router)
+app.include_router(analytics_router)
 
 
 @app.get("/health")

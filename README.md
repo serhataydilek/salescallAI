@@ -451,6 +451,15 @@ The calls page supports local search and filtering as your call history grows:
 - Filter by status, source type, and score range.
 - Sort by newest, oldest, highest score, or lowest score.
 
+## Analytics Dashboard
+
+The home dashboard summarizes local coaching activity across calls:
+
+- Averages and category insights use analyzed calls only.
+- Calls without analysis still count toward totals and recent activity.
+- Score distribution groups analyzed calls into strong, decent, weak, and poor buckets.
+- No external analytics provider is used.
+
 ## Deleting Calls
 
 Use `Delete Call` from the call list or report page to remove one selected local call. This deletes the call record, transcript, analysis, and the uploaded audio file when that file is inside `backend/storage/uploads/`.
