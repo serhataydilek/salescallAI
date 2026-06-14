@@ -153,6 +153,19 @@ The analysis uses the configured provider. With `USE_MOCK_LLM=true`, it uses moc
 
 This is useful for testing prompt and model quality without waiting for faster-whisper transcription.
 
+## Editing Transcripts and Re-running Analysis
+
+Transcripts from audio can contain mistakes. Open a call report and click `Edit Transcript` in the transcript section to correct speaker labels, wording, or missing text.
+
+Saving a transcript:
+
+- validates that the transcript is not empty and is at least 30 characters
+- updates the stored transcript without touching the uploaded audio file
+- marks the call status back to `transcribed`
+- keeps the existing report visible, but shows a warning that the analysis may be outdated
+
+Click `Re-run Analysis` after saving to analyze the corrected transcript. Re-analysis uses the current configured provider, so it is also useful after switching between mock and Ollama providers or changing the coaching rubric. If a report already exists, SalesMirror updates that analysis record instead of creating a duplicate.
+
 ## Install Ollama
 
 Install Ollama from the official download page:

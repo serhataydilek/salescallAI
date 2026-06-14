@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { DeleteCallButton } from "@/components/DeleteCallButton";
 import { PrintButton } from "@/components/PrintButton";
+import { ReAnalyzeButton } from "@/components/ReAnalyzeButton";
+import { TranscriptEditor } from "@/components/TranscriptEditor";
 import { type Analysis, getCall, reportUrl } from "@/lib/api";
 
 type PageProps = {
@@ -85,6 +87,7 @@ export default async function CallDetailPage({ params }: PageProps) {
   const analysis = call.analysis;
   const transcriptText = call.transcript?.text.trim() ?? "";
   const isFailed = call.status === "failed";
+  const hasOutdatedAnalysis = call.status === "transcribed" && Boolean(analysis);
   const createdAt = new Date(call.created_at).toLocaleString();
 
   return (
@@ -112,6 +115,7 @@ export default async function CallDetailPage({ params }: PageProps) {
               </a>
             </>
           ) : null}
+          {transcriptText ? <ReAnalyzeButton callId={call.id} /> : null}
           <DeleteCallButton callId={call.id} redirectTo="/calls" />
         </div>
       </header>
@@ -119,6 +123,12 @@ export default async function CallDetailPage({ params }: PageProps) {
       {isFailed ? (
         <div className="message error">
           This call is marked as failed. Upload the audio again or create a new report from a pasted transcript.
+        </div>
+      ) : null}
+
+      {hasOutdatedAnalysis ? (
+        <div className="message warning">
+          Transcript was updated. Re-run analysis for an up-to-date report.
         </div>
       ) : null}
 
@@ -188,14 +198,7 @@ export default async function CallDetailPage({ params }: PageProps) {
           <span className="eyebrow">Transcript</span>
           <h2>Call Transcript</h2>
         </div>
-        {transcriptText ? (
-          <pre className="transcript-box">{transcriptText}</pre>
-        ) : (
-          <div className="empty-state compact">
-            <h3>No transcript yet</h3>
-            <p>Transcribe uploaded audio or paste an existing transcript to generate a complete coaching report.</p>
-          </div>
-        )}
+        <TranscriptEditor callId={call.id} initialTranscript={transcriptText} />
       </section>
     </article>
   );

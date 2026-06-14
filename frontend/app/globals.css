@@ -272,6 +272,12 @@ textarea {
   color: var(--danger);
 }
 
+.warning {
+  background: #fff8e6;
+  border-color: #f3cf7a;
+  color: var(--warning);
+}
+
 .helper-text,
 .demo-note {
   color: var(--muted);
@@ -327,6 +333,11 @@ code {
 }
 
 .delete-call-control {
+  display: grid;
+  gap: 8px;
+}
+
+.reanalyze-control {
   display: grid;
   gap: 8px;
 }
@@ -666,6 +677,20 @@ pre {
 
 .transcript-box {
   max-height: 520px;
+}
+
+.transcript-editor,
+.transcript-edit-form {
+  display: grid;
+  gap: 12px;
+}
+
+.transcript-update-message {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
 }
 
 .skeleton {

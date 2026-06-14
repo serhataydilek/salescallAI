@@ -1,3 +1,4 @@
+from datetime import datetime
 from pathlib import Path
 from uuid import uuid4
 
@@ -17,6 +18,7 @@ from app.schemas import (
     CreateTranscriptCallRequest,
     DeleteCallResponse,
     TranscriptOut,
+    UpdateTranscriptRequest,
     UploadResponse,
 )
 from app.services.providers import get_llm_service, get_transcription_service
@@ -161,6 +163,42 @@ def transcribe_call(call_id: int, db: Session = Depends(get_db)) -> TranscriptOu
     return transcript
 
 
+@router.put("/{call_id}/transcript", response_model=CallDetailOut)
+def update_transcript(
+    call_id: int, request: UpdateTranscriptRequest, db: Session = Depends(get_db)
+) -> CallDetailOut:
+    call = get_call_with_related(db, call_id)
+    if not call:
+        raise HTTPException(status_code=404, detail="Call not found.")
+
+    transcript_text = request.transcript.strip()
+    if not transcript_text:
+        raise HTTPException(status_code=400, detail="Transcript cannot be empty.")
+    if len(transcript_text) < MIN_TRANSCRIPT_LENGTH:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Transcript must be at least {MIN_TRANSCRIPT_LENGTH} characters.",
+        )
+
+    try:
+        transcript = call.transcript or Transcript(call_id=call.id, text=transcript_text)
+        transcript.text = transcript_text
+        call.status = CallStatus.transcribed
+        call.updated_at = datetime.utcnow()
+
+        db.add(transcript)
+        db.commit()
+        db.refresh(call)
+    except Exception as exc:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Could not update transcript.") from exc
+
+    updated_call = get_call_with_related(db, call.id)
+    if not updated_call:
+        raise HTTPException(status_code=500, detail="Updated call could not be loaded.")
+    return updated_call
+
+
 @router.post("/{call_id}/analyze", response_model=AnalysisOut)
 def analyze_call(call_id: int, db: Session = Depends(get_db)) -> AnalysisOut:
     call = get_call_with_related(db, call_id)
@@ -176,6 +214,7 @@ def analyze_call(call_id: int, db: Session = Depends(get_db)) -> AnalysisOut:
         for key, value in result_data.items():
             setattr(analysis, key, value)
         call.status = CallStatus.analyzed
+        call.updated_at = datetime.utcnow()
 
         db.add(analysis)
         db.commit()

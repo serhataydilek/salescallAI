@@ -63,6 +63,10 @@ class CreateTranscriptCallRequest(BaseModel):
     transcript: str
 
 
+class UpdateTranscriptRequest(BaseModel):
+    transcript: str
+
+
 class ClearCallsResponse(BaseModel):
     deleted_count: int
     deleted_files: int

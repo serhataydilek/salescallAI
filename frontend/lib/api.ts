@@ -140,6 +140,14 @@ export function createCallFromTranscript(input: { title?: string; transcript: st
   });
 }
 
+export function updateTranscript(id: number, transcript: string): Promise<CallDetail> {
+  return request<CallDetail>(`/calls/${id}/transcript`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ transcript }),
+  });
+}
+
 export function transcribeCall(id: number): Promise<Transcript> {
   return request<Transcript>(`/calls/${id}/transcribe`, { method: "POST" });
 }
