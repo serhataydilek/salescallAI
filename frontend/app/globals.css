@@ -534,6 +534,16 @@ code {
   gap: 8px;
 }
 
+.restore-control {
+  display: grid;
+  gap: 12px;
+}
+
+.restore-control .message {
+  display: grid;
+  gap: 4px;
+}
+
 .delete-call-control {
   display: grid;
   gap: 8px;

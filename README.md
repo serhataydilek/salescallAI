@@ -470,6 +470,14 @@ SalesMirror supports local exports without external integrations:
 - Audio files are not embedded in exports; call exports include metadata and transcript/report data only.
 - Exports are useful before clearing local calls or moving data elsewhere.
 
+## Backup and Restore
+
+Use `Download Calls JSON` on the calls page to create a local backup of call records, transcripts, and analyses.
+
+Use `Restore from JSON` on the calls page to import a previous SalesMirror calls JSON export. Restore creates new local call IDs and skips duplicate backups when the same title, creation date, and transcript text are already present.
+
+Uploaded audio files are not embedded in the JSON backup and are not restored. For restored audio calls, SalesMirror keeps safe title/source metadata only and marks the audio file path as not restored.
+
 ## Deleting Calls
 
 Use `Delete Call` from the call list or report page to remove one selected local call. This deletes the call record, transcript, analysis, and the uploaded audio file when that file is inside `backend/storage/uploads/`.

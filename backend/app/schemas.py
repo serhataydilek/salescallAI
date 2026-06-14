@@ -78,6 +78,14 @@ class DeleteCallResponse(BaseModel):
     message: str
 
 
+class ImportCallsResponse(BaseModel):
+    imported_calls: int
+    imported_transcripts: int
+    imported_analyses: int
+    skipped_items: int
+    message: str
+
+
 class ScoreDistributionOut(BaseModel):
     strong: int
     decent: int

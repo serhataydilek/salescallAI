@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CallList } from "@/components/CallList";
 import { ClearCallsButton } from "@/components/ClearCallsButton";
+import { RestoreCallsControl } from "@/components/RestoreCallsControl";
 import { callsCsvExportUrl, callsJsonExportUrl, type Call, type CallFilters, getCalls } from "@/lib/api";
 
 type CallsPageProps = {
@@ -87,6 +88,17 @@ export default async function CallsPage({ searchParams }: CallsPageProps) {
           Download Calls CSV
         </a>
       </div>
+
+      <details className="secondary-tool">
+        <summary>Backup and restore</summary>
+        <div className="secondary-tool-body">
+          <p>
+            Download Calls JSON for a local backup, or restore a previous SalesMirror JSON export. Restore creates new
+            local call IDs and skips duplicates when the same title, date, and transcript already exist.
+          </p>
+          <RestoreCallsControl />
+        </div>
+      </details>
 
       <form action="/calls" className="filter-panel">
         <label className="field">

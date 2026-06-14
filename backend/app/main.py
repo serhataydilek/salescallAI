@@ -12,6 +12,7 @@ from app.database import Base, engine
 from app.routers.analytics import router as analytics_router
 from app.routers.calls import router as calls_router
 from app.routers.exports import router as exports_router
+from app.routers.imports import router as imports_router
 
 if os.getenv("SALESMIRROR_AUTO_CREATE_TABLES", "").strip().lower() in {"1", "true", "yes", "on"}:
     # Local fallback only. Use Alembic migrations for normal schema management.
@@ -30,6 +31,7 @@ app.add_middleware(
 app.include_router(calls_router)
 app.include_router(analytics_router)
 app.include_router(exports_router)
+app.include_router(imports_router)
 
 
 @app.get("/health")

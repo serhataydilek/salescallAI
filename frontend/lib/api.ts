@@ -108,6 +108,14 @@ export type AnalyticsSummary = {
   improvement_delta: AnalyticsImprovementDelta;
 };
 
+export type ImportCallsResponse = {
+  imported_calls: number;
+  imported_transcripts: number;
+  imported_analyses: number;
+  skipped_items: number;
+  message: string;
+};
+
 export class ApiError extends Error {
   status: number;
 
@@ -247,4 +255,13 @@ export function callsCsvExportUrl(): string {
 
 export function analyticsJsonExportUrl(): string {
   return `${API_BASE_URL}/exports/analytics.json`;
+}
+
+export function importCallsJson(file: File, dryRun = false): Promise<ImportCallsResponse> {
+  const body = new FormData();
+  body.append("file", file);
+  return request<ImportCallsResponse>(`/imports/calls.json?dry_run=${dryRun ? "true" : "false"}`, {
+    method: "POST",
+    body,
+  });
 }
