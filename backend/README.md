@@ -63,6 +63,12 @@ OLLAMA_MODEL=qwen2.5:7b
 
 ## Smoke Tests
 
+Run backend regression tests:
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest
+```
+
 Test Ollama analysis without the frontend:
 
 ```powershell
