@@ -5,7 +5,13 @@ from sqlalchemy.orm import Session, selectinload
 from app.database import get_db
 from app.models import Call, CallStatus
 from app.routers.calls import MANUAL_TRANSCRIPT_FILE_PATH
-from app.schemas import AnalyticsSummaryOut, RecentCallSummaryOut, ScoreDistributionOut
+from app.schemas import (
+    AnalyticsSummaryOut,
+    ImprovementDeltaOut,
+    RecentCallSummaryOut,
+    ScoreDistributionOut,
+    ScoreTrendPointOut,
+)
 
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
@@ -29,6 +35,8 @@ def analytics_summary(db: Session = Depends(get_db)) -> AnalyticsSummaryOut:
         ).all()
     )
     analyzed = [call for call in calls if call.analysis is not None]
+    analyzed_oldest_first = sorted(analyzed, key=lambda call: call.created_at)
+    trend_calls = analyzed_oldest_first[-10:]
 
     averages = _score_averages(analyzed)
     weakest_category = None
@@ -60,6 +68,8 @@ def analytics_summary(db: Session = Depends(get_db)) -> AnalyticsSummaryOut:
             )
             for call in calls[:5]
         ],
+        score_trend=_score_trend(trend_calls),
+        improvement_delta=_improvement_delta(analyzed_oldest_first),
         **averages,
     )
 
@@ -106,3 +116,48 @@ def _score_distribution(calls: list[Call]) -> ScoreDistributionOut:
         else:
             distribution["poor"] += 1
     return ScoreDistributionOut(**distribution)
+
+
+def _score_trend(calls: list[Call]) -> list[ScoreTrendPointOut]:
+    return [
+        ScoreTrendPointOut(
+            id=call.id,
+            title=call.filename,
+            created_at=call.created_at,
+            overall_score=call.analysis.overall_score,
+            opening_score=call.analysis.opening_score,
+            discovery_score=call.analysis.discovery_score,
+            objection_handling_score=call.analysis.objection_handling_score,
+            closing_score=call.analysis.closing_score,
+            follow_up_score=call.analysis.follow_up_score,
+        )
+        for call in calls
+        if call.analysis
+    ]
+
+
+def _improvement_delta(calls: list[Call]) -> ImprovementDeltaOut:
+    if len(calls) < 2:
+        return ImprovementDeltaOut(
+            first_score=None,
+            latest_score=None,
+            delta=None,
+            direction="insufficient_data",
+        )
+
+    first_score = calls[0].analysis.overall_score
+    latest_score = calls[-1].analysis.overall_score
+    delta = latest_score - first_score
+    if delta > 0:
+        direction = "improved"
+    elif delta < 0:
+        direction = "declined"
+    else:
+        direction = "unchanged"
+
+    return ImprovementDeltaOut(
+        first_score=first_score,
+        latest_score=latest_score,
+        delta=delta,
+        direction=direction,
+    )

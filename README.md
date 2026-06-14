@@ -458,7 +458,8 @@ The home dashboard summarizes local coaching activity across calls:
 - Averages and category insights use analyzed calls only.
 - Calls without analysis still count toward totals and recent activity.
 - Score distribution groups analyzed calls into strong, decent, weak, and poor buckets.
-- No external analytics provider is used.
+- Score trend uses the latest analyzed calls and shows whether scores improved, declined, or stayed unchanged.
+- No external analytics provider or charting dependency is used.
 
 ## Deleting Calls
 

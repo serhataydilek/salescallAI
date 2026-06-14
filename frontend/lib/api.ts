@@ -62,6 +62,25 @@ export type AnalyticsRecentCall = {
   created_at: string;
 };
 
+export type AnalyticsTrendPoint = {
+  id: number;
+  title: string;
+  created_at: string;
+  overall_score: number;
+  opening_score: number;
+  discovery_score: number;
+  objection_handling_score: number;
+  closing_score: number;
+  follow_up_score: number;
+};
+
+export type AnalyticsImprovementDelta = {
+  first_score: number | null;
+  latest_score: number | null;
+  delta: number | null;
+  direction: "improved" | "declined" | "unchanged" | "insufficient_data";
+};
+
 export type AnalyticsSummary = {
   total_calls: number;
   analyzed_calls: number;
@@ -85,6 +104,8 @@ export type AnalyticsSummary = {
     poor: number;
   };
   recent_calls: AnalyticsRecentCall[];
+  score_trend: AnalyticsTrendPoint[];
+  improvement_delta: AnalyticsImprovementDelta;
 };
 
 export class ApiError extends Error {

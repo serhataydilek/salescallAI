@@ -275,6 +275,51 @@ button:disabled {
   height: 100%;
 }
 
+.trend-list {
+  display: grid;
+  gap: 10px;
+}
+
+.trend-row {
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+}
+
+.trend-row-top {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.trend-row-top strong {
+  overflow-wrap: anywhere;
+}
+
+.trend-row-top span,
+.trend-date {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.trend-track {
+  background: #d8dee8;
+  border-radius: 999px;
+  height: 9px;
+  overflow: hidden;
+}
+
+.trend-fill {
+  background: var(--success);
+  border-radius: 999px;
+  height: 100%;
+}
+
 .source-grid {
   display: grid;
   gap: 12px;

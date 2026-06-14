@@ -55,6 +55,13 @@ def test_empty_database_returns_zero_and_null_summary(client):
     assert summary["strongest_category"] is None
     assert summary["score_distribution"] == {"strong": 0, "decent": 0, "weak": 0, "poor": 0}
     assert summary["recent_calls"] == []
+    assert summary["score_trend"] == []
+    assert summary["improvement_delta"] == {
+        "first_score": None,
+        "latest_score": None,
+        "delta": None,
+        "direction": "insufficient_data",
+    }
 
 
 def test_analytics_summary_counts_sources_averages_distribution_and_recent_calls(client):
@@ -148,3 +155,103 @@ def test_analytics_summary_counts_sources_averages_distribution_and_recent_calls
     ]
     assert summary["recent_calls"][2]["source"] == "audio"
     assert summary["recent_calls"][3]["overall_score"] == 85
+    assert [call["title"] for call in summary["score_trend"]] == [
+        "Poor call",
+        "Weak call",
+        "Decent call",
+        "Strong call",
+    ]
+    assert summary["score_trend"][0]["overall_score"] == 30
+    assert summary["score_trend"][0]["discovery_score"] == 20
+    assert summary["score_trend"][-1]["follow_up_score"] == 95
+    assert summary["improvement_delta"] == {
+        "first_score": 30,
+        "latest_score": 85,
+        "delta": 55,
+        "direction": "improved",
+    }
+
+
+def test_score_trend_maxes_at_latest_ten_analyzed_calls(client):
+    for index in range(12):
+        add_call(
+            title=f"Trend call {index + 1}",
+            status=CallStatus.analyzed,
+            score=40 + index,
+            created_at=datetime(2026, 2, index + 1, tzinfo=timezone.utc),
+        )
+
+    response = client.get("/analytics/summary")
+
+    assert response.status_code == 200, response.text
+    summary = response.json()
+    assert len(summary["score_trend"]) == 10
+    assert [call["title"] for call in summary["score_trend"]] == [f"Trend call {index}" for index in range(3, 13)]
+    assert summary["improvement_delta"] == {
+        "first_score": 40,
+        "latest_score": 51,
+        "delta": 11,
+        "direction": "improved",
+    }
+
+
+def test_improvement_delta_declined(client):
+    add_call(
+        title="First high score",
+        status=CallStatus.analyzed,
+        score=80,
+        created_at=datetime(2026, 3, 1, tzinfo=timezone.utc),
+    )
+    add_call(
+        title="Latest lower score",
+        status=CallStatus.analyzed,
+        score=65,
+        created_at=datetime(2026, 3, 2, tzinfo=timezone.utc),
+    )
+
+    assert client.get("/analytics/summary").json()["improvement_delta"] == {
+        "first_score": 80,
+        "latest_score": 65,
+        "delta": -15,
+        "direction": "declined",
+    }
+
+
+def test_improvement_delta_unchanged(client):
+    add_call(
+        title="First equal score",
+        status=CallStatus.analyzed,
+        score=70,
+        created_at=datetime(2026, 4, 1, tzinfo=timezone.utc),
+    )
+    add_call(
+        title="Latest equal score",
+        status=CallStatus.analyzed,
+        score=70,
+        created_at=datetime(2026, 4, 2, tzinfo=timezone.utc),
+    )
+
+    assert client.get("/analytics/summary").json()["improvement_delta"] == {
+        "first_score": 70,
+        "latest_score": 70,
+        "delta": 0,
+        "direction": "unchanged",
+    }
+
+
+def test_improvement_delta_insufficient_data_with_one_analyzed_call(client):
+    add_call(
+        title="Only analyzed call",
+        status=CallStatus.analyzed,
+        score=70,
+        created_at=datetime(2026, 5, 1, tzinfo=timezone.utc),
+    )
+
+    summary = client.get("/analytics/summary").json()
+    assert len(summary["score_trend"]) == 1
+    assert summary["improvement_delta"] == {
+        "first_score": None,
+        "latest_score": None,
+        "delta": None,
+        "direction": "insufficient_data",
+    }

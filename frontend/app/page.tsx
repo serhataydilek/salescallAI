@@ -31,6 +31,60 @@ function DistributionBar({ label, value, total }: { label: string; value: number
   );
 }
 
+function trendDeltaLabel(summary: AnalyticsSummary): { label: string; helper: string } {
+  const delta = summary.improvement_delta;
+  if (delta.direction === "insufficient_data" || delta.delta === null) {
+    return {
+      label: "Need more analyzed calls",
+      helper: "Analyze at least two calls to see trend.",
+    };
+  }
+  if (delta.direction === "improved") {
+    return {
+      label: `Improved +${delta.delta}`,
+      helper: `${delta.first_score}/100 to ${delta.latest_score}/100`,
+    };
+  }
+  if (delta.direction === "declined") {
+    return {
+      label: `Declined ${delta.delta}`,
+      helper: `${delta.first_score}/100 to ${delta.latest_score}/100`,
+    };
+  }
+  return {
+    label: "No change",
+    helper: `${delta.first_score}/100 to ${delta.latest_score}/100`,
+  };
+}
+
+function ScoreTrend({ summary }: { summary: AnalyticsSummary }) {
+  if (summary.score_trend.length < 2) {
+    return (
+      <div className="empty-state compact">
+        <h3>Not enough trend data</h3>
+        <p>Analyze at least two calls to see trend.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="trend-list">
+      {summary.score_trend.map((point) => (
+        <Link className="trend-row" href={`/calls/${point.id}`} key={point.id}>
+          <div className="trend-row-top">
+            <strong>{point.title}</strong>
+            <span>{point.overall_score}/100</span>
+          </div>
+          <div className="trend-track">
+            <div className="trend-fill" style={{ width: `${point.overall_score}%` }} />
+          </div>
+          <span className="trend-date">{new Date(point.created_at).toLocaleDateString()}</span>
+        </Link>
+      ))}
+    </div>
+  );
+}
+
 function LatestCalls({ summary }: { summary: AnalyticsSummary }) {
   if (summary.recent_calls.length === 0) {
     return (
@@ -48,7 +102,7 @@ function LatestCalls({ summary }: { summary: AnalyticsSummary }) {
           <div>
             <strong>{call.title}</strong>
             <span>
-              {call.source === "audio" ? "Audio upload" : "Pasted transcript"} ·{" "}
+              {call.source === "audio" ? "Audio upload" : "Pasted transcript"} -{" "}
               {new Date(call.created_at).toLocaleString()}
             </span>
           </div>
@@ -71,6 +125,7 @@ export default async function DashboardPage() {
   } catch {
     loadError = "Backend is not reachable. Start the FastAPI server to load dashboard insights.";
   }
+  const deltaLabel = summary ? trendDeltaLabel(summary) : null;
 
   return (
     <>
@@ -111,6 +166,7 @@ export default async function DashboardPage() {
             />
             <StatCard label="Weakest Category" value={summary.weakest_category ?? "No data"} />
             <StatCard label="Strongest Category" value={summary.strongest_category ?? "No data"} />
+            <StatCard label="Score Trend" value={deltaLabel?.label ?? "No data"} helper={deltaLabel?.helper} />
           </section>
 
           {summary.analyzed_calls === 0 && summary.total_calls > 0 ? (
@@ -120,6 +176,14 @@ export default async function DashboardPage() {
           ) : null}
 
           <section className="section dashboard-two-column">
+            <div className="panel analytics-panel">
+              <div className="section-heading">
+                <span className="eyebrow">Trend</span>
+                <h2>Latest Analyzed Scores</h2>
+              </div>
+              <ScoreTrend summary={summary} />
+            </div>
+
             <div className="panel analytics-panel">
               <div className="section-heading">
                 <span className="eyebrow">Score Distribution</span>

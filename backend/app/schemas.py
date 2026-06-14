@@ -94,6 +94,25 @@ class RecentCallSummaryOut(BaseModel):
     created_at: datetime
 
 
+class ScoreTrendPointOut(BaseModel):
+    id: int
+    title: str
+    created_at: datetime
+    overall_score: int
+    opening_score: int
+    discovery_score: int
+    objection_handling_score: int
+    closing_score: int
+    follow_up_score: int
+
+
+class ImprovementDeltaOut(BaseModel):
+    first_score: int | None
+    latest_score: int | None
+    delta: int | None
+    direction: Literal["improved", "declined", "unchanged", "insufficient_data"]
+
+
 class AnalyticsSummaryOut(BaseModel):
     total_calls: int
     analyzed_calls: int
@@ -112,3 +131,5 @@ class AnalyticsSummaryOut(BaseModel):
     strongest_category: str | None
     score_distribution: ScoreDistributionOut
     recent_calls: list[RecentCallSummaryOut]
+    score_trend: list[ScoreTrendPointOut]
+    improvement_delta: ImprovementDeltaOut
