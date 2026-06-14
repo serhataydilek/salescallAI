@@ -2,6 +2,17 @@ export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://loca
 export const ALLOWED_AUDIO_EXTENSIONS = [".mp3", ".wav", ".m4a", ".webm"];
 
 export type CallStatus = "uploaded" | "transcribed" | "analyzed" | "failed";
+export type CallSource = "audio" | "transcript";
+export type CallSort = "newest" | "oldest" | "score_desc" | "score_asc";
+
+export type CallFilters = {
+  q?: string;
+  status?: CallStatus;
+  source?: CallSource;
+  min_score?: string;
+  max_score?: string;
+  sort?: CallSort;
+};
 
 export type Call = {
   id: number;
@@ -105,8 +116,15 @@ export function validateTranscriptInput(transcript: string): string | null {
   return null;
 }
 
-export function getCalls(): Promise<Call[]> {
-  return request<Call[]>("/calls");
+export function getCalls(filters: CallFilters = {}): Promise<Call[]> {
+  const searchParams = new URLSearchParams();
+  for (const [key, value] of Object.entries(filters)) {
+    if (value) {
+      searchParams.set(key, value);
+    }
+  }
+  const query = searchParams.toString();
+  return request<Call[]>(`/calls${query ? `?${query}` : ""}`);
 }
 
 export function getCall(id: string): Promise<CallDetail> {

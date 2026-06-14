@@ -1,14 +1,68 @@
 import Link from "next/link";
 import { CallList } from "@/components/CallList";
 import { ClearCallsButton } from "@/components/ClearCallsButton";
-import { type Call, getCalls } from "@/lib/api";
+import { type Call, type CallFilters, getCalls } from "@/lib/api";
 
-export default async function CallsPage() {
+type CallsPageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+const statusOptions = ["uploaded", "transcribed", "analyzed", "failed"] as const;
+const sourceOptions = ["audio", "transcript"] as const;
+const sortOptions = [
+  { label: "Newest", value: "newest" },
+  { label: "Oldest", value: "oldest" },
+  { label: "Score: High to Low", value: "score_desc" },
+  { label: "Score: Low to High", value: "score_asc" },
+] as const;
+
+function singleValue(value: string | string[] | undefined): string {
+  return Array.isArray(value) ? value[0] ?? "" : value ?? "";
+}
+
+function parseFilters(params: Record<string, string | string[] | undefined>): CallFilters {
+  const q = singleValue(params.q).trim();
+  const status = singleValue(params.status);
+  const source = singleValue(params.source);
+  const minScore = singleValue(params.min_score);
+  const maxScore = singleValue(params.max_score);
+  const sort = singleValue(params.sort);
+
+  return {
+    q,
+    status: statusOptions.includes(status as (typeof statusOptions)[number])
+      ? (status as CallFilters["status"])
+      : undefined,
+    source: sourceOptions.includes(source as (typeof sourceOptions)[number])
+      ? (source as CallFilters["source"])
+      : undefined,
+    min_score: minScore,
+    max_score: maxScore,
+    sort: sortOptions.some((option) => option.value === sort) ? (sort as CallFilters["sort"]) : undefined,
+  };
+}
+
+function activeFilterLabels(filters: CallFilters): string[] {
+  const labels: string[] = [];
+  if (filters.q) labels.push(`Search: ${filters.q}`);
+  if (filters.status) labels.push(`Status: ${filters.status}`);
+  if (filters.source) labels.push(`Source: ${filters.source}`);
+  if (filters.min_score) labels.push(`Min score: ${filters.min_score}`);
+  if (filters.max_score) labels.push(`Max score: ${filters.max_score}`);
+  if (filters.sort && filters.sort !== "newest") {
+    labels.push(sortOptions.find((option) => option.value === filters.sort)?.label ?? filters.sort);
+  }
+  return labels;
+}
+
+export default async function CallsPage({ searchParams }: CallsPageProps) {
+  const filters = parseFilters(await searchParams);
+  const activeFilters = activeFilterLabels(filters);
   let calls: Call[] = [];
   let loadError = "";
 
   try {
-    calls = await getCalls();
+    calls = await getCalls(filters);
   } catch {
     loadError = "Backend is not reachable. Start the FastAPI server to load calls.";
   }
@@ -24,7 +78,83 @@ export default async function CallsPage() {
           Upload
         </Link>
       </div>
-      {loadError ? <div className="message error">{loadError}</div> : <CallList calls={calls} />}
+
+      <form action="/calls" className="filter-panel">
+        <label className="field">
+          <span>Search</span>
+          <input
+            defaultValue={filters.q ?? ""}
+            name="q"
+            placeholder="Title or transcript text"
+            type="search"
+          />
+        </label>
+        <label className="field">
+          <span>Status</span>
+          <select defaultValue={filters.status ?? ""} name="status">
+            <option value="">All statuses</option>
+            {statusOptions.map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="field">
+          <span>Source</span>
+          <select defaultValue={filters.source ?? ""} name="source">
+            <option value="">All sources</option>
+            <option value="audio">Audio upload</option>
+            <option value="transcript">Pasted transcript</option>
+          </select>
+        </label>
+        <label className="field">
+          <span>Min score</span>
+          <input defaultValue={filters.min_score ?? ""} max="100" min="0" name="min_score" type="number" />
+        </label>
+        <label className="field">
+          <span>Max score</span>
+          <input defaultValue={filters.max_score ?? ""} max="100" min="0" name="max_score" type="number" />
+        </label>
+        <label className="field">
+          <span>Sort</span>
+          <select defaultValue={filters.sort ?? "newest"} name="sort">
+            {sortOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <div className="filter-actions">
+          <button type="submit">Apply Filters</button>
+          <Link className="button secondary" href="/calls">
+            Reset
+          </Link>
+        </div>
+        {activeFilters.length > 0 ? (
+          <div className="active-filters">
+            <span>Active filters</span>
+            {activeFilters.map((filter) => (
+              <strong key={filter}>{filter}</strong>
+            ))}
+          </div>
+        ) : null}
+      </form>
+
+      {loadError ? (
+        <div className="message error">{loadError}</div>
+      ) : (
+        <CallList
+          calls={calls}
+          emptyMessage={
+            activeFilters.length > 0
+              ? "No calls match the current filters. Reset filters or adjust the search."
+              : undefined
+          }
+          showUploadAction={activeFilters.length === 0}
+        />
+      )}
 
       {!loadError ? (
         <div className="danger-zone">

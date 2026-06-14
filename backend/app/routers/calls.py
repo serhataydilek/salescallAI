@@ -4,7 +4,7 @@ from uuid import uuid4
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from fastapi.responses import PlainTextResponse
-from sqlalchemy import select
+from sqlalchemy import case, func, or_, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.config import get_upload_dir
@@ -70,6 +70,18 @@ def remove_local_upload(file_path: str) -> bool:
 
     target.unlink()
     return True
+
+
+def parse_optional_score(value: str | None, name: str) -> int | None:
+    if value is None or value.strip() == "":
+        return None
+    try:
+        score = int(value)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=f"{name} must be an integer from 0 to 100.") from exc
+    if score < 0 or score > 100:
+        raise HTTPException(status_code=400, detail=f"{name} must be between 0 and 100.")
+    return score
 
 
 @router.post("/upload", response_model=UploadResponse)
@@ -228,8 +240,75 @@ def analyze_call(call_id: int, db: Session = Depends(get_db)) -> AnalysisOut:
 
 
 @router.get("", response_model=list[CallOut])
-def list_calls(db: Session = Depends(get_db)) -> list[CallOut]:
-    return list(db.scalars(select(Call).order_by(Call.created_at.desc())).all())
+def list_calls(
+    q: str | None = None,
+    status: str | None = None,
+    source: str | None = None,
+    min_score: str | None = None,
+    max_score: str | None = None,
+    sort: str = "newest",
+    db: Session = Depends(get_db),
+) -> list[CallOut]:
+    parsed_status = status.strip() if status else ""
+    parsed_source = source.strip() if source else ""
+    parsed_sort = (sort or "newest").strip() or "newest"
+    parsed_min_score = parse_optional_score(min_score, "min_score")
+    parsed_max_score = parse_optional_score(max_score, "max_score")
+
+    if parsed_status and parsed_status not in {status.value for status in CallStatus}:
+        raise HTTPException(status_code=400, detail="Invalid status filter.")
+    if parsed_source and parsed_source not in {"audio", "transcript"}:
+        raise HTTPException(status_code=400, detail="Invalid source filter.")
+    if parsed_sort not in {"newest", "oldest", "score_desc", "score_asc"}:
+        raise HTTPException(status_code=400, detail="Invalid sort value.")
+    if parsed_min_score is not None and parsed_max_score is not None and parsed_min_score > parsed_max_score:
+        raise HTTPException(status_code=400, detail="min_score cannot be greater than max_score.")
+
+    statement = select(Call).outerjoin(Transcript).outerjoin(Analysis).options(
+        selectinload(Call.transcript), selectinload(Call.analysis)
+    )
+
+    search_text = (q or "").strip().lower()
+    if search_text:
+        search_pattern = f"%{search_text}%"
+        statement = statement.where(
+            or_(
+                func.lower(Call.filename).like(search_pattern),
+                func.lower(Transcript.text).like(search_pattern),
+            )
+        )
+
+    if parsed_status:
+        statement = statement.where(Call.status == CallStatus(parsed_status))
+
+    if parsed_source == "transcript":
+        statement = statement.where(Call.file_path == MANUAL_TRANSCRIPT_FILE_PATH)
+    elif parsed_source == "audio":
+        statement = statement.where(Call.file_path != MANUAL_TRANSCRIPT_FILE_PATH)
+
+    if parsed_min_score is not None:
+        statement = statement.where(Analysis.overall_score >= parsed_min_score)
+    if parsed_max_score is not None:
+        statement = statement.where(Analysis.overall_score <= parsed_max_score)
+
+    if parsed_sort == "oldest":
+        statement = statement.order_by(Call.created_at.asc())
+    elif parsed_sort == "score_desc":
+        statement = statement.order_by(
+            case((Analysis.overall_score.is_(None), 1), else_=0),
+            Analysis.overall_score.desc(),
+            Call.created_at.desc(),
+        )
+    elif parsed_sort == "score_asc":
+        statement = statement.order_by(
+            case((Analysis.overall_score.is_(None), 1), else_=0),
+            Analysis.overall_score.asc(),
+            Call.created_at.desc(),
+        )
+    else:
+        statement = statement.order_by(Call.created_at.desc())
+
+    return list(db.scalars(statement).all())
 
 
 @router.delete("", response_model=ClearCallsResponse)

@@ -230,7 +230,10 @@ input[type="file"] {
   width: 100%;
 }
 
+input[type="number"],
+input[type="search"],
 input[type="text"],
+select,
 textarea {
   background: var(--surface-muted);
   border: 1px solid var(--border);
@@ -256,6 +259,52 @@ textarea {
   color: var(--text);
   font-size: 14px;
   font-weight: 800;
+}
+
+.filter-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  padding: 18px;
+}
+
+.filter-panel .field:first-child {
+  grid-column: span 2;
+}
+
+.filter-actions {
+  align-items: end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  grid-column: span 2;
+}
+
+.active-filters {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  grid-column: 1 / -1;
+}
+
+.active-filters span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.active-filters strong {
+  background: #eaf4ff;
+  border: 1px solid #b5d7f5;
+  border-radius: 999px;
+  color: var(--primary-dark);
+  font-size: 13px;
+  padding: 5px 9px;
 }
 
 .message {
@@ -760,6 +809,15 @@ li {
 
   .two-column {
     grid-template-columns: 1fr;
+  }
+
+  .filter-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-panel .field:first-child,
+  .filter-actions {
+    grid-column: auto;
   }
 
   .report-header {

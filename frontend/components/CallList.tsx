@@ -2,12 +2,20 @@ import Link from "next/link";
 import { DeleteCallButton } from "@/components/DeleteCallButton";
 import type { Call } from "@/lib/api";
 
-export function CallList({ calls, showUploadAction = true }: { calls: Call[]; showUploadAction?: boolean }) {
+export function CallList({
+  calls,
+  emptyMessage = "Upload a call or seed demo data to see the coaching report workflow.",
+  showUploadAction = true,
+}: {
+  calls: Call[];
+  emptyMessage?: string;
+  showUploadAction?: boolean;
+}) {
   if (calls.length === 0) {
     return (
       <div className="empty-state">
         <h3>No calls yet</h3>
-        <p>Upload a call or seed demo data to see the coaching report workflow.</p>
+        <p>{emptyMessage}</p>
         {showUploadAction ? (
           <Link className="button" href="/upload">
             Upload First Call

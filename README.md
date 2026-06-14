@@ -443,6 +443,14 @@ SalesMirror reports can be shared from the call detail page:
 - Reports use the latest saved transcript and latest analysis. If you edit a transcript, click `Re-run Analysis` before sharing so the report reflects the corrected transcript.
 - Native PDF export is deferred for now to keep the MVP lightweight. The current supported PDF path is browser print/save-as-PDF.
 
+## Finding Calls
+
+The calls page supports local search and filtering as your call history grows:
+
+- Search by call title or transcript text.
+- Filter by status, source type, and score range.
+- Sort by newest, oldest, highest score, or lowest score.
+
 ## Deleting Calls
 
 Use `Delete Call` from the call list or report page to remove one selected local call. This deletes the call record, transcript, analysis, and the uploaded audio file when that file is inside `backend/storage/uploads/`.
