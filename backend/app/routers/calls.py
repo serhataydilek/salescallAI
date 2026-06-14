@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from uuid import uuid4
 
@@ -7,6 +7,7 @@ from fastapi.responses import PlainTextResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
+from app.config import get_upload_dir
 from app.database import get_db
 from app.models import Analysis, Call, CallStatus, Transcript
 from app.schemas import (
@@ -27,8 +28,6 @@ from app.services.title_service import generate_call_title
 
 router = APIRouter(prefix="/calls", tags=["calls"])
 
-UPLOAD_DIR = Path(__file__).resolve().parents[2] / "storage" / "uploads"
-UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 ALLOWED_AUDIO_EXTENSIONS = {".mp3", ".wav", ".m4a", ".webm"}
 MAX_UPLOAD_CHUNK_SIZE = 1024 * 1024
 MIN_TRANSCRIPT_LENGTH = 30
@@ -59,7 +58,7 @@ def remove_local_upload(file_path: str) -> bool:
         return False
 
     try:
-        upload_root = UPLOAD_DIR.resolve()
+        upload_root = get_upload_dir().resolve()
         target = Path(file_path).resolve(strict=False)
     except OSError:
         return False
@@ -77,7 +76,7 @@ def remove_local_upload(file_path: str) -> bool:
 async def upload_call(file: UploadFile = File(...), db: Session = Depends(get_db)) -> UploadResponse:
     safe_filename = validate_upload_filename(file.filename)
     stored_filename = f"{uuid4().hex}_{safe_filename}"
-    file_path = UPLOAD_DIR / stored_filename
+    file_path = get_upload_dir() / stored_filename
 
     total_bytes = 0
     with file_path.open("wb") as output:
@@ -184,7 +183,7 @@ def update_transcript(
         transcript = call.transcript or Transcript(call_id=call.id, text=transcript_text)
         transcript.text = transcript_text
         call.status = CallStatus.transcribed
-        call.updated_at = datetime.utcnow()
+        call.updated_at = datetime.now(timezone.utc)
 
         db.add(transcript)
         db.commit()
@@ -214,7 +213,7 @@ def analyze_call(call_id: int, db: Session = Depends(get_db)) -> AnalysisOut:
         for key, value in result_data.items():
             setattr(analysis, key, value)
         call.status = CallStatus.analyzed
-        call.updated_at = datetime.utcnow()
+        call.updated_at = datetime.now(timezone.utc)
 
         db.add(analysis)
         db.commit()

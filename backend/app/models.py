@@ -1,10 +1,14 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 
 from sqlalchemy import JSON, DateTime, Enum as SqlEnum, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
+
+
+def utc_now() -> datetime:
+    return datetime.now(timezone.utc)
 
 
 class CallStatus(str, Enum):
@@ -23,9 +27,9 @@ class Call(Base):
     status: Mapped[CallStatus] = mapped_column(
         SqlEnum(CallStatus), default=CallStatus.uploaded, nullable=False
     )
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+        DateTime(timezone=True), default=utc_now, onupdate=utc_now
     )
 
     transcript: Mapped["Transcript | None"] = relationship(
@@ -42,7 +46,7 @@ class Transcript(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     call_id: Mapped[int] = mapped_column(ForeignKey("calls.id"), unique=True)
     text: Mapped[str] = mapped_column(Text, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
 
     call: Mapped[Call] = relationship(back_populates="transcript")
 
@@ -64,6 +68,6 @@ class Analysis(Base):
     suggested_improvements: Mapped[list[str]] = mapped_column(JSON, nullable=False)
     better_example_responses: Mapped[list[str]] = mapped_column(JSON, nullable=False)
     short_summary: Mapped[str] = mapped_column(Text, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
 
     call: Mapped[Call] = relationship(back_populates="analysis")

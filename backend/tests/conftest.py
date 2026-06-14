@@ -14,14 +14,17 @@ os.environ["DATABASE_URL"] = f"sqlite:///{TEST_DB_PATH.as_posix()}"
 
 from app.database import Base, engine
 from app.main import app
+from app.config import reset_upload_dir
 
 
 @pytest.fixture(autouse=True)
 def reset_database():
+    reset_upload_dir()
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
     yield
     Base.metadata.drop_all(bind=engine)
+    reset_upload_dir()
 
 
 @pytest.fixture

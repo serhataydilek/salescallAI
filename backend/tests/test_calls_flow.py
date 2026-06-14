@@ -1,5 +1,6 @@
 from sqlalchemy import select
 
+from app.config import set_upload_dir
 from app.database import SessionLocal
 from app.models import Analysis, Call, CallStatus, Transcript
 
@@ -127,8 +128,55 @@ def test_delete_selected_call_cascades_and_keeps_other_calls(client):
         assert db.get(Call, second_call["id"]) is not None
 
 
+def test_delete_uploaded_call_removes_file_inside_configured_upload_dir(client, tmp_path):
+    upload_dir = tmp_path / "uploads"
+    upload_dir.mkdir()
+    set_upload_dir(upload_dir)
+    uploaded_file = upload_dir / "fake-call.wav"
+    uploaded_file.write_text("not real audio")
+
+    untouched_call = create_transcript_call(client, title="Untouched call")
+    client.post(f"/calls/{untouched_call['id']}/analyze")
+
+    with SessionLocal() as db:
+        call = Call(filename="fake-call.wav", file_path=str(uploaded_file), status=CallStatus.transcribed)
+        call.transcript = Transcript(text=VALID_TRANSCRIPT)
+        call.analysis = Analysis(
+            overall_score=55,
+            opening_score=70,
+            discovery_score=45,
+            objection_handling_score=60,
+            closing_score=50,
+            follow_up_score=52,
+            talk_ratio_feedback="The salesperson should ask more discovery questions.",
+            top_3_mistakes=["Discovery was shallow.", "Value was vague.", "Close was weak."],
+            missed_questions=["Who approves the pilot?"],
+            suggested_improvements=["Confirm a specific next step."],
+            better_example_responses=["Would a two-week pilot prove the value?"],
+            short_summary="The call needs clearer discovery and follow-up.",
+        )
+        db.add(call)
+        db.commit()
+        call_id = call.id
+
+    response = client.delete(f"/calls/{call_id}")
+    assert response.status_code == 200, response.text
+    assert response.json()["deleted_call_id"] == call_id
+    assert response.json()["deleted_file"] is True
+    assert not uploaded_file.exists()
+    assert client.get(f"/calls/{call_id}").status_code == 404
+
+    with SessionLocal() as db:
+        assert db.get(Call, call_id) is None
+        assert db.scalar(select(Transcript).where(Transcript.call_id == call_id)) is None
+        assert db.scalar(select(Analysis).where(Analysis.call_id == call_id)) is None
+        assert db.get(Call, untouched_call["id"]) is not None
+
+
 def test_delete_does_not_remove_files_outside_upload_dir(client, tmp_path):
-    # TODO: Add positive upload-file deletion coverage if the upload directory becomes configurable for tests.
+    upload_dir = tmp_path / "uploads"
+    upload_dir.mkdir()
+    set_upload_dir(upload_dir)
     outside_upload_file = tmp_path / "outside-upload.wav"
     outside_upload_file.write_text("not real audio")
 
