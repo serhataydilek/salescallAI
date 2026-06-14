@@ -43,8 +43,8 @@ function ScoreCard({ label, value }: { label: string; value: number }) {
   );
 }
 
-function AssistantCoaching({ cards }: { cards: Analysis["assistant_coaching_cards"] }) {
-  if (cards.length === 0) {
+function AssistantCoaching({ cards }: { cards?: Analysis["assistant_coaching_cards"] }) {
+  if (!cards || cards.length === 0) {
     return null;
   }
 
