@@ -1,7 +1,9 @@
+import os
+from pathlib import Path
+
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from dotenv import load_dotenv
-from pathlib import Path
 
 BACKEND_DIR = Path(__file__).resolve().parents[1]
 load_dotenv(BACKEND_DIR / ".env")
@@ -9,7 +11,9 @@ load_dotenv(BACKEND_DIR / ".env")
 from app.database import Base, engine
 from app.routers.calls import router as calls_router
 
-Base.metadata.create_all(bind=engine)
+if os.getenv("SALESMIRROR_AUTO_CREATE_TABLES", "").strip().lower() in {"1", "true", "yes", "on"}:
+    # Local fallback only. Use Alembic migrations for normal schema management.
+    Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="SalesMirror API", version="0.1.0")
 

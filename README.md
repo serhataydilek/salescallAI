@@ -27,17 +27,28 @@ cd C:\Users\serfu\OneDrive\Desktop\projects\salescall\salesmirror\backend
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
+.\.venv\Scripts\alembic.exe upgrade head
 uvicorn app.main:app --reload --port 8000
 ```
 
 Backend API: `http://localhost:8000`
 
-SQLite is used by default and creates `salesmirror.db` locally. To use PostgreSQL, set `DATABASE_URL` before starting the backend:
+SQLite is used by default and creates `salesmirror.db` locally after migrations run. To use PostgreSQL, set `DATABASE_URL` before running migrations and starting the backend:
 
 ```powershell
 $env:DATABASE_URL="postgresql+psycopg://postgres:postgres@localhost:5432/salesmirror"
+.\.venv\Scripts\alembic.exe upgrade head
 uvicorn app.main:app --reload --port 8000
 ```
+
+Create a new migration after changing backend SQLAlchemy models:
+
+```powershell
+cd C:\Users\serfu\OneDrive\Desktop\projects\salescall\salesmirror\backend
+.\.venv\Scripts\alembic.exe revision --autogenerate -m "message"
+```
+
+Do not commit local database files.
 
 ## Run Frontend
 
@@ -518,4 +529,3 @@ For this MVP, uploaded files are stored locally in `backend/storage/uploads/` an
 - Ollama JSON quality depends on the local model.
 - faster-whisper can be slow on CPU for long calls.
 - Text report export is implemented; PDF export is not.
-- Database migrations are not implemented yet.

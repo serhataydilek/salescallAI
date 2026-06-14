@@ -16,6 +16,24 @@ The API will be available at `http://localhost:8000`.
 
 SQLite is used by default. Set `DATABASE_URL` to use PostgreSQL.
 
+Run migrations before starting the backend against a fresh database:
+
+```powershell
+.\.venv\Scripts\alembic.exe upgrade head
+```
+
+SQLite is the default local MVP database. PostgreSQL can be used by setting `DATABASE_URL` before running migrations and starting the app. Do not commit local database files.
+
+If you already have a pre-Alembic local SQLite database with data, back it up first. Use `alembic stamp head` only when the existing schema already matches the current models.
+
+Create a new migration after changing SQLAlchemy models:
+
+```powershell
+.\.venv\Scripts\alembic.exe revision --autogenerate -m "message"
+```
+
+The backend no longer creates tables unconditionally on startup. Alembic is the normal schema path. For one-off local recovery only, set `SALESMIRROR_AUTO_CREATE_TABLES=true` before starting the backend.
+
 ## Environment
 
 The backend app and backend scripts load local settings from:
